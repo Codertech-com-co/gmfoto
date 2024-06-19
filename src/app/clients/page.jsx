@@ -1,5 +1,6 @@
-"use client"
-import React, { useMemo, useState } from 'react';
+"use client";
+import React, { useMemo, useState, useEffect } from 'react';
+import { fetchClients } from '../../utils/api/clients';
 import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
@@ -22,7 +23,7 @@ import {
     Tooltip,
 } from "@material-tailwind/react";
 import Link from 'next/link';
-import { LoadingPage } from '@/components/ui/Loafing';
+import { LoadingPage } from '@/components/ui/Loading';
 
 const TABS = [
     {
@@ -41,67 +42,45 @@ const TABS = [
 
 const TABLE_HEAD = ["Cliente", "Empresa", "Status", "Creado", ""];
 
-const TABLE_ROWS = [
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-        name: "John Michael",
-        email: "john@creative-tim.com",
-        job: "Manager",
-        org: "Organization",
-        online: true,
-        date: "23/04/18",
-    },
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-2.jpg",
-        name: "Alexa Liras",
-        email: "alexa@creative-tim.com",
-        job: "Programator",
-        org: "Developer",
-        online: false,
-        date: "23/04/18",
-    },
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-1.jpg",
-        name: "Laurent Perrier",
-        email: "laurent@creative-tim.com",
-        job: "Executive",
-        org: "Projects",
-        online: false,
-        date: "19/09/17",
-    },
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-4.jpg",
-        name: "Michael Levi",
-        email: "michael@creative-tim.com",
-        job: "Programator",
-        org: "Developer",
-        online: true,
-        date: "24/12/08",
-    },
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg",
-        name: "Richard Gran",
-        email: "richard@creative-tim.com",
-        job: "Manager",
-        org: "Executive",
-        online: false,
-        date: "04/10/21",
-    },
-    // Agrega más filas según sea necesario
-];
-
 const ROWS_PER_PAGE = 10;
 
-export function SortableTable() {
-
+export default function SortableTable() {
+    const [TABLE_ROWS, setTableRows] = useState([]);
     const [loading, setLoading] = useState(true);
-
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
     const [status, setStatus] = useState('all');
-    const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), []);
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const data = await fetchClients();
+            const dataTable = data.map(client => ({
+                id: client.id,
+                img: 'https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-5.jpg',
+                name: client.nombrePersonaContacto,
+                owner: client.propietario,
+                email: client.email,
+                job: client.nombrePersonaContacto,
+                org: client.NombreEstablecimiento,
+                online: true,
+                date: "04/10/2024",
+            }));
+            setTableRows(dataTable);
+            setLoading(false);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+
+        fetchData();
+    }, []);
+
+    const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), [TABLE_ROWS]);
 
     const handlePreviousPage = () => {
         if (currentPage > 1) {
@@ -144,7 +123,7 @@ export function SortableTable() {
                 value.toString().toLowerCase().includes(search.toLowerCase())
             )
         );
-    }, [search]);
+    }, [search, TABLE_ROWS]);
 
     const sortedRows = useMemo(() => {
         return [...filteredRows].sort((a, b) => {
@@ -162,15 +141,11 @@ export function SortableTable() {
     }, [filteredRows, sortColumn, sortDirection]);
 
     const handleStatus = (value) => {
-        console.log(value.toString())
         setStatus(value.toString());
     };
-    
 
     const paginatedRows = useMemo(() => {
-        setLoading(true);
         const filteredByStatus = status === 'all' ? sortedRows : sortedRows.filter(row => row.online.toString() === status);
-        setLoading(false);
         return filteredByStatus.slice(
             (currentPage - 1) * ROWS_PER_PAGE,
             currentPage * ROWS_PER_PAGE
@@ -179,8 +154,7 @@ export function SortableTable() {
 
     if (loading) {
         return <LoadingPage />;
-      }
-      
+    }
 
     return (
         <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
@@ -195,9 +169,6 @@ export function SortableTable() {
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        {/* <Button variant="outlined" size="sm">
-                            view all
-                        </Button> */}
                         <Link href={"clients/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Nuevo
                         </Link>
@@ -207,7 +178,7 @@ export function SortableTable() {
                     <Tabs value="all" className="w-full md:w-max">
                         <TabsHeader>
                             {TABS.map(({ label, value }) => (
-                                <Tab key={value} value={value} className='' onClick={() => handleStatus(value)}>
+                                <Tab key={value} value={value} onClick={() => handleStatus(value)}>
                                     &nbsp;&nbsp;{label}&nbsp;&nbsp;
                                 </Tab>
                             ))}
@@ -221,9 +192,9 @@ export function SortableTable() {
                         />
                     </div>
                 </div>
-
                 <br />
-                <Button variant='outlined' className='border-yellow-500 text-balnk' size='sm'>Exportar Datos</Button>
+                <Button variant='outlined' className='border-yellow-500 text-black m-2' onClick={() => fetchData()} size='sm'>Actualizar</Button>
+                <Button variant='outlined' className='border-yellow-500 text-black m-2' size='sm'>Exportar Datos</Button>
             </CardHeader>
             <CardBody className="overflow-auto px-0">
                 <table className="mt-4 w-full min-w-max table-auto text-left">
@@ -251,7 +222,7 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ img, name, email, job, org, online, date }, index) => {
+                            ({ id,img, name, email, job, owner, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -276,7 +247,7 @@ export function SortableTable() {
                                                             color="blue-gray"
                                                             className="font-normal opacity-70"
                                                         >
-                                                            <a href={"https://mail.google.com/mail/?view=cm&fs=1&to=" + email} target='_blanck'>{email}</a>
+                                                            <a href={"https://mail.google.com/mail/?view=cm&fs=1&to=" + email} target='_blank' rel="noopener noreferrer">{email}</a>
                                                         </Typography>
                                                     </Tooltip>
                                                 </div>
@@ -289,7 +260,7 @@ export function SortableTable() {
                                                     color="blue-gray"
                                                     className="font-normal"
                                                 >
-                                                    {job}
+                                                    {owner}
                                                 </Typography>
                                                 <Typography
                                                     variant="small"
@@ -321,9 +292,9 @@ export function SortableTable() {
                                         </td>
                                         <td className={classes}>
                                             <Tooltip content="Editar Usuario">
-                                                <IconButton variant="text">
+                                                <Link href={'clients/'+id}>
                                                     <PencilIcon className="h-4 w-4" />
-                                                </IconButton>
+                                                </Link>
                                             </Tooltip>
                                         </td>
                                     </tr>
@@ -335,11 +306,11 @@ export function SortableTable() {
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                 <Typography variant="small" color="blue-gray" className="font-normal">
-                    Pagina {currentPage} de {totalPages}
+                    Página {currentPage} de {totalPages}
                 </Typography>
                 <div className="flex gap-2">
                     <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>
-                        Anteriror
+                        Anterior
                     </Button>
                     <Button className='bg-yellow-500 text-black' size="sm" onClick={handleNextPage}>
                         Siguiente
@@ -350,4 +321,5 @@ export function SortableTable() {
     );
 }
 
-export default SortableTable;
+
+

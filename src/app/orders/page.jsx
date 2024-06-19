@@ -152,10 +152,10 @@ export function SortableTable() {
                 <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
                         <Typography variant="h5" color="blue-gray">
-                            Lista de Equipos
+                            Ordenes de Servicio
                         </Typography>
                         <Typography color="gray" className="mt-1 font-normal">
-                            Ver información sobre todos los equipos externos
+                            Ver información sobre todas las ordenes de servicio
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
@@ -163,7 +163,7 @@ export function SortableTable() {
                             view all
                         </Button> */}
                         <Link href={"clients/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
-                            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Nuevo
+                            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Orden
                         </Link>
                     </div>
                 </div>

@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import Image from 'next/image'
 import {
   Navbar,
   Collapse,
@@ -42,7 +43,7 @@ const navListMenuItems = [
     title: "Ordenes de Servicio",
     description: "Cree, Modifique y Busque",
     icon: NewspaperIcon,
-    href:"#"
+    href:"/orders"
   },
   {
     title: "Equipos",
@@ -60,9 +61,11 @@ const navListMenuItems = [
     title: "Comunicación",
     description: "Crea recordatorios y notifica a tus clientes",
     icon: PhoneIcon,
-    href:"#"
+    href:"/communication"
   },
 ];
+
+
 
 function NavListMenu() {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -70,15 +73,15 @@ function NavListMenu() {
   const renderItems = navListMenuItems.map(
     ({ icon, title, description,href }, key) => (
       <Link href={href} key={key}>
-        <MenuItem className="flex items-center gap-3 rounded-lg">
-          <div className="flex items-center justify-center rounded-lg !bg-blue-gray-50 p-2 ">
+        <MenuItem className="flex items-center gap-3 rounded-lg group/item hover:bg-yellow-50">
+          <div className="flex items-center justify-center rounded-lg  p-2 group-hover/item:bg-yellow-400  ">
             {" "}
             {React.createElement(icon, {
               strokeWidth: 2,
-              className: "h-6 text-gray-900 w-6",
+              className: "h-6 text-gray-900 w-6 ",
             })}
           </div>
-          <div>
+          <div className="">
             <Typography
               variant="h6"
               color="blue-gray"
@@ -158,7 +161,8 @@ function NavList() {
       <NavListMenu />
       <Typography
         as="a"
-        href="#"
+        href="https://api.whatsapp.com"
+        target="_blank"
         variant="small"
         color="blue-gray"
         className="font-medium"
@@ -188,10 +192,10 @@ export default function MegaMenuWithHover() {
           <Typography
             as="a"
             href="#"
-            variant="h6"
+            variant="h5"
             className="mr-4 cursor-pointer py-1.5 lg:ml-2"
           >
-            GM FOTO
+            <Image src={'/images/logo.png'} width={'100'} height={'80'}/>
           </Typography>
           <div className="hidden lg:block">
             <NavList />

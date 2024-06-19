@@ -56,7 +56,7 @@ export default () => {
                     Inventario
                 </Typography>
                 <div className="flex  gap-4 col-span-2 md:col-span-1 w-full place-content-end" >
-                    <Button className="bg-yellow-500 text-blank">Crear Producto</Button>
+                    <Button className="bg-yellow-500 text-black">Crear Producto</Button>
                     <Button variant="outlined" className="border-yellow-500">Subir Inventario</Button>
                 </div>
             </div>
@@ -166,7 +166,7 @@ export default () => {
                                         </td>
                                         <td className={classes}>
                                             <Tooltip content="Inspeccionar">
-                                                <IconButton size="sm" className="bg-yellow-500 text-blank">
+                                                <IconButton size="sm" className="bg-yellow-500 text-black">
                                                     <ClipboardDocumentCheckIcon className="h-4 w-4" />
                                                 </IconButton>
                                             </Tooltip>

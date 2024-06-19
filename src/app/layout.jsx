@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
           {children}
         </div>
 
-        <footer className="text-center items-end">
+        <footer className="text-center items-end text-black">
           <small>CoderTech © 2024</small>
         </footer>
 
