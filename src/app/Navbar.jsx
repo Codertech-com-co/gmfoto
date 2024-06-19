@@ -48,7 +48,7 @@ const navListMenuItems = [
     title: "Equipos",
     description: "Cree, Modifique y Busque",
     icon: RectangleGroupIcon,
-    href:"#"
+    href:"/equipos"
   },
   {
     title: "Inventario",
