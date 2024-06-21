@@ -1,11 +1,14 @@
 "use client";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import React, { useMemo, useState, useEffect } from 'react';
 import { fetchClients } from '../../utils/api/clients';
 import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, UserPlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+
 import {
     Card,
     CardHeader,
@@ -24,6 +27,9 @@ import {
 } from "@material-tailwind/react";
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
+import { useRouter } from 'next/navigation';
+
+const MySwal = withReactContent(Swal);
 
 const TABS = [
     {
@@ -45,6 +51,7 @@ const TABLE_HEAD = ["Cliente", "Empresa", "Status", "Creado", ""];
 const ROWS_PER_PAGE = 10;
 
 export default function SortableTable() {
+    const router = useRouter();
     const [TABLE_ROWS, setTableRows] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
@@ -69,6 +76,17 @@ export default function SortableTable() {
             }));
             setTableRows(dataTable);
             setLoading(false);
+
+            MySwal.fire({
+                title: "Lista actualizada",
+                icon: "success",
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+
+            })
         } catch (error) {
             console.error('Error fetching data:', error);
             setLoading(false);
@@ -156,6 +174,74 @@ export default function SortableTable() {
         return <LoadingPage />;
     }
 
+
+    const deleteClient = (id) => {
+        try {
+            MySwal.fire({
+                title: "¿Estas seguro?",
+                text: "No podrás revertir esto!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#FFEB3B",
+                confirmButtonText: "Si, borrar!",
+                cancelButtonText: "Cancelar",
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+
+                    const requestOptions = {
+                        method: "DELETE",
+                        redirect: "follow"
+                    };
+
+                    var result = await fetch("http://127.0.0.1:3001/clients/" + id, requestOptions)
+                        .then((response) => response.json())
+                        .then((result) => {
+                           
+                            MySwal.fire(
+                                {
+                                    title: "Borrado!",
+                                    icon: "success",
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: "bottom",
+                                    timer: 3000
+                                }
+                            );
+                            fetchData()
+                        })
+                        .catch((error) => {
+                            MySwal.fire(
+                                {
+                                    title: "Error al eliminar!",
+                                    icon: "error",
+                                    showConfirmButton: false,
+                                    toast: true,
+                                    position: "bottom",
+                                    timer: 3000
+                                }
+                            );
+                        });
+
+
+                }
+            });
+        }
+        catch (error) {
+            MySwal.fire(
+                {
+                    title: "Error al eliminar!",
+                    icon: "error",
+                    showConfirmButton: false,
+                    toast: true,
+                    position: "bottom",
+                    timer: 3000
+                }
+            );
+
+
+        }
+    }
+
     return (
         <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
             <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -222,7 +308,7 @@ export default function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ id,img, name, email, job, owner, org, online, date }, index) => {
+                            ({ id, img, name, email, job, owner, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -290,11 +376,16 @@ export default function SortableTable() {
                                                 {date}
                                             </Typography>
                                         </td>
-                                        <td className={classes}>
+                                        <td className={classes + ' flex'}>
                                             <Tooltip content="Editar Usuario">
-                                                <Link href={'clients/'+id}>
+                                                <Link href={'clients/' + id} className='m-2 p-2'>
                                                     <PencilIcon className="h-4 w-4" />
                                                 </Link>
+                                            </Tooltip>
+                                            <Tooltip content="Eliminar Cliente">
+                                                <Button className='m-2 p-1' onClick={() => deleteClient(id)}>
+                                                    <TrashIcon className="h-4 w-4" />
+                                                </Button>
                                             </Tooltip>
                                         </td>
                                     </tr>

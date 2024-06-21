@@ -1,10 +1,15 @@
 "use client";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
 import { Button } from "@material-tailwind/react";
 import { Breadcrumbs } from "@material-tailwind/react";
+import { useRouter } from 'next/navigation';
+
+const MySwal = withReactContent(Swal);
 
 const fetchClientData = async (clientId) => {
   const requestOptions = {
@@ -31,11 +36,26 @@ const updateClientData = async (clientId, data) => {
   const result = await response.json();
   return result;
 };
+const insertClientData = async ( data) => {
+  const requestOptions = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+    redirect: "follow",
+  };
 
-export default function ClientForm( {params}) {
+  const response = await fetch(`http://127.0.0.1:3001/clients/`, requestOptions);
+  const result = await response.json();
+  return result;
+};
+
+export default function ClientForm({ params }) {
   const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
   const [client, setClient] = useState(null);
   const clientId = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
+  const router = useRouter();
 
   useEffect(() => {
     const loadClientData = async () => {
@@ -50,12 +70,41 @@ export default function ClientForm( {params}) {
   }, [clientId, reset]);
 
   const onSubmit = async (data) => {
-    console.log(data);
+    // console.log(data);
     try {
-      const updatedClient = await updateClientData(clientId, data);
-      console.log("Cliente actualizado:", updatedClient);
+      if (clientId =='create'){
+        const insert = await insertClientData( data);
+      }else{
+        const updatedClient = await updateClientData(clientId, data);
+      }
+      
+      MySwal.fire({
+        title:"Datos Guardados",
+        icon:"success",
+        toast:true,
+        position:"bottom",
+        showConfirmButton:false,
+        timer:3000,
+        timerProgressBar:false,
+        
+      })
+      setTimeout(()=>{
+        router.push('/clients');
+      },500)
+      
+      // console.log("Cliente actualizado:", updatedClient);
     } catch (error) {
-      console.error("Error actualizando cliente:", error);
+      MySwal.fire({
+        title:"Error actualizando cliente",
+        icon:"error",
+        toast:true,
+        position:"bottom",
+        showConfirmButton:false,
+        timer:5000,
+        timerProgressBar:false,
+        
+      })
+      // console.error("Error actualizando cliente:", error);
     }
   };
 
@@ -77,78 +126,100 @@ export default function ClientForm( {params}) {
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
+        <b className='text-black col-span-2'>Datos Empresa</b>
         <Input
-          label="Documento"
-          {...register("documento", { required: true })}
-          defaultValue={client?.documento}
+          label="Identificación"
+          name="documento"
+          register={register}
+          rules={{ required: true }}
+          errors={errors}
         />
-        {errors.documento && <span>Este campo es obligatorio</span>}
-
         <Input
           label="Razón Social"
-          {...register("razonSocial", { required: true })}
-          defaultValue={client?.razonSocial}
+          name="razonSocial"
+          register={register}
+          rules={{ required: true }}
+          errors={errors}
         />
-        {errors.razonSocial && <span>Este campo es obligatorio</span>}
-
         <Input
           label="Nombre Establecimiento"
-          {...register("NombreEstablecimiento")}
-          defaultValue={client?.NombreEstablecimiento}
+          name="NombreEstablecimiento"
+          register={register}
+          errors={errors}
+        />
+        <Input
+          label="WhatsApp"
+          name="whatsApp"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Teléfono"
-          {...register("telefonoEstablecimiento")}
-          defaultValue={client?.telefonoEstablecimiento}
+          name="telefonoEstablecimiento"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Correo Electrónico"
-          {...register("email", {
-            pattern: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
-          })}
-          defaultValue={client?.email}
+          name="email"
+          register={register}
+          rules={{
+            pattern: {
+              value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
+              message: "Email no válido"
+            }
+          }}
+          errors={errors}
         />
-        {errors.email && <span>Email no válido</span>}
-
         <Input
           label="Propietario"
-          {...register("propietario")}
-          defaultValue={client?.propietario}
+          name="propietario"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Dirección"
-          {...register("direccion")}
-          defaultValue={client?.direccion}
+          name="direccion"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Ciudad"
-          {...register("ciudad")}
-          defaultValue={client?.ciudad}
+          name="ciudad"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Celular"
-          {...register("celularPropietario")}
-          defaultValue={client?.celularPropietario}
-        />
-        <Input
-          label="Nombre persona de Contacto"
-          {...register("nombrePersonaContacto")}
-          defaultValue={client?.nombrePersonaContacto}
+          name="celularPropietario"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Página Web"
-          {...register("paginaWeb")}
-          defaultValue={client?.paginaWeb}
+          name="paginaWeb"
+          register={register}
+          errors={errors}
         />
         <Input
           label="Tipo Gestión"
-          {...register("tipoGestion")}
-          defaultValue={client?.tipoGestion}
+          name="tipoGestion"
+          register={register}
+          errors={errors}
         />
+        <b className='text-black col-span-2'>Datos de Contacto</b>
+        <Input
+          label="Nombre persona de Contacto"
+          name="nombrePersonaContacto"
+          register={register}
+          errors={errors}
+        />
+        
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Link href={"../clients"} className="m-2 text-black">Cancelar</Link>
+          <Link href="../clients" className="m-2 text-black">Cancelar</Link>
           <Button type="submit" color="yellow" className="m-2">Guardar</Button>
+          
         </div>
       </form>
     </div>

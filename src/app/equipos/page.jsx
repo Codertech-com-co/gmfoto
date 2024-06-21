@@ -1,5 +1,7 @@
 "use client"
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState,useEffect } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
@@ -23,7 +25,9 @@ import {
 } from "@material-tailwind/react";
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
+import { fetchEquipos } from '../../utils/api/equipos';
 
+const MySwal = withReactContent(Swal);
 const TABS = [
     {
         label: "Todos",
@@ -41,30 +45,72 @@ const TABS = [
 
 const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura","Creado por","Modificado por"];
 
-const TABLE_ROWS = [
-    {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-        name: "John Michael",
-        email: "john@creative-tim.com",
-        job: "Manager",
-        org: "Organization",
-        online: true,
-        date: "23/04/18",
-        date: "23/04/18",
-    }
-];
+// const TABLE_ROWS = [
+//     {
+//         img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
+//         name: "John Michael",
+//         email: "john@creative-tim.com",
+//         job: "Manager",
+//         org: "Organization",
+//         online: true,
+//         date: "23/04/18",
+//         date: "23/04/18",
+//     }
+// ];
 
 const ROWS_PER_PAGE = 10;
 
 export function SortableTable() {
 
     const [loading, setLoading] = useState(true);
-
+    const [TABLE_ROWS, setTableRows] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
     const [status, setStatus] = useState('all');
+    
+
+
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const data = await fetchEquipos();
+            const dataTable = data.map(client => ({
+                id: client.id,
+                referecia: client.referencia,
+                descripcion: client.descripcion,
+                owner: client.propietario,
+                email: client.email,
+                job: client.nombrePersonaContacto,
+                org: client.NombreEstablecimiento,
+                online: true,
+                date: "04/10/2024",
+            }));
+            setTableRows(dataTable);
+            setLoading(false);
+
+            MySwal.fire({
+                title: "Lista actualizada",
+                icon: "success",
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+
+            })
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        console.log(TABLE_ROWS)
+
+        fetchData();
+    }, []);
     const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), []);
 
     const handlePreviousPage = () => {
@@ -215,7 +261,7 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ img, name, email, job, org, online, date }, index) => {
+                            ({ id,referecia, descripcion, email, job, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -225,25 +271,16 @@ export function SortableTable() {
                                     <tr key={name}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
-                                                <Avatar src={img} alt={name} size="sm" />
-                                                <div className="flex flex-col">
-                                                    <Typography
-                                                        variant="small"
-                                                        color="blue-gray"
-                                                        className="font-normal"
-                                                    >
-                                                        {name}
-                                                    </Typography>
-                                                    <Tooltip content="Redacte un Correo">
+                                                
                                                         <Typography
                                                             variant="small"
                                                             color="blue-gray"
                                                             className="font-normal opacity-70"
                                                         >
-                                                            <a href={"https://mail.google.com/mail/?view=cm&fs=1&to=" + email} target='_blanck'>{email}</a>
+                                                            {referecia}
                                                         </Typography>
-                                                    </Tooltip>
-                                                </div>
+                                                
+                                               
                                             </div>
                                         </td>
                                         <td className={classes}>
@@ -253,15 +290,9 @@ export function SortableTable() {
                                                     color="blue-gray"
                                                     className="font-normal"
                                                 >
-                                                    {job}
+                                                    {descripcion}
                                                 </Typography>
-                                                <Typography
-                                                    variant="small"
-                                                    color="blue-gray"
-                                                    className="font-normal opacity-70"
-                                                >
-                                                    {org}
-                                                </Typography>
+                                                
                                             </div>
                                         </td>
                                         <td className={classes}>
