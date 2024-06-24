@@ -1,5 +1,5 @@
 "use client"
-import React, { useMemo, useState,useEffect } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import {
@@ -27,6 +27,8 @@ import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
 import { fetchEquipos } from '../../utils/api/equipos';
 
+   
+
 const MySwal = withReactContent(Swal);
 const TABS = [
     {
@@ -43,24 +45,14 @@ const TABS = [
     },
 ];
 
-const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura","Creado por","Modificado por"];
-
-// const TABLE_ROWS = [
-//     {
-//         img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
-//         name: "John Michael",
-//         email: "john@creative-tim.com",
-//         job: "Manager",
-//         org: "Organization",
-//         online: true,
-//         date: "23/04/18",
-//         date: "23/04/18",
-//     }
-// ];
+const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura", "Creado por", "Modificado por"];
 
 const ROWS_PER_PAGE = 10;
 
 export function SortableTable() {
+
+   
+    
 
     const [loading, setLoading] = useState(true);
     const [TABLE_ROWS, setTableRows] = useState([]);
@@ -69,8 +61,6 @@ export function SortableTable() {
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
     const [status, setStatus] = useState('all');
-    
-
 
     const fetchData = async () => {
         try {
@@ -78,14 +68,14 @@ export function SortableTable() {
             const data = await fetchEquipos();
             const dataTable = data.map(client => ({
                 id: client.id,
-                referecia: client.referencia,
+                referencia: client.referencia,
                 descripcion: client.descripcion,
-                owner: client.propietario,
-                email: client.email,
-                job: client.nombrePersonaContacto,
-                org: client.NombreEstablecimiento,
-                online: true,
-                date: "04/10/2024",
+                serial: client.serial,
+                marca: client.marca,
+                fechaFactura: client.fecha_factura,
+                creadoPor: client.creadoPor,
+                modificadoPor: client.modificadoPor,
+                online: client.online,  // Supongo que hay un campo para el estado online/offline
             }));
             setTableRows(dataTable);
             setLoading(false);
@@ -98,7 +88,6 @@ export function SortableTable() {
                 showConfirmButton: false,
                 timer: 3000,
                 timerProgressBar: false,
-
             })
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -107,11 +96,10 @@ export function SortableTable() {
     };
 
     useEffect(() => {
-        console.log(TABLE_ROWS)
-
         fetchData();
     }, []);
-    const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), []);
+
+    const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), [TABLE_ROWS]);
 
     const handlePreviousPage = () => {
         if (currentPage > 1) {
@@ -132,10 +120,13 @@ export function SortableTable() {
 
     const handleSort = (column) => {
         const columnMapping = {
-            Cliente: 'name',
-            Empresa: 'org',
-            Status: 'online',
-            Creado: 'date',
+            "Referencia": 'referencia',
+            "Descripción": 'descripcion',
+            "Serial": 'serial',
+            "Marca": 'marca',
+            "Fecha Factura": 'fechaFactura',
+            "Creado por": 'creadoPor',
+            "Modificado por": 'modificadoPor',
         };
 
         const mappedColumn = columnMapping[column];
@@ -151,10 +142,10 @@ export function SortableTable() {
     const filteredRows = useMemo(() => {
         return TABLE_ROWS.filter((row) =>
             Object.values(row).some((value) =>
-                value.toString().toLowerCase().includes(search.toLowerCase())
+                (value?.toString() ?? '').toLowerCase().includes(search.toLowerCase())
             )
         );
-    }, [search]);
+    }, [search, TABLE_ROWS]);
 
     const sortedRows = useMemo(() => {
         return [...filteredRows].sort((a, b) => {
@@ -172,15 +163,11 @@ export function SortableTable() {
     }, [filteredRows, sortColumn, sortDirection]);
 
     const handleStatus = (value) => {
-        console.log(value.toString())
         setStatus(value.toString());
     };
-    
 
     const paginatedRows = useMemo(() => {
-        setLoading(true);
         const filteredByStatus = status === 'all' ? sortedRows : sortedRows.filter(row => row.online.toString() === status);
-        setLoading(false);
         return filteredByStatus.slice(
             (currentPage - 1) * ROWS_PER_PAGE,
             currentPage * ROWS_PER_PAGE
@@ -189,8 +176,7 @@ export function SortableTable() {
 
     if (loading) {
         return <LoadingPage />;
-      }
-      
+    }
 
     return (
         <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
@@ -205,10 +191,7 @@ export function SortableTable() {
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        {/* <Button variant="outlined" size="sm">
-                            view all
-                        </Button> */}
-                        <Link href={"clients/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
+                        <Link href={"equipos/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Nuevo
                         </Link>
                     </div>
@@ -233,7 +216,7 @@ export function SortableTable() {
                 </div>
 
                 <br />
-                <Button variant='outlined' className='border-yellow-500 text-balnk' size='sm'>Exportar Datos</Button>
+                <Button variant='outlined' className='border-yellow-500 text-black' size='sm'>Exportar Datos</Button>
             </CardHeader>
             <CardBody className="overflow-auto px-0">
                 <table className="mt-4 w-full min-w-max table-auto text-left">
@@ -261,39 +244,81 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ id,referecia, descripcion, email, job, org, online, date }, index) => {
+                            ({ id, referencia, descripcion, serial, marca, fechaFactura, creadoPor, modificadoPor, online }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
                                     : "p-4 border-b border-blue-gray-50";
 
                                 return (
-                                    <tr key={name}>
+                                    <tr key={id}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
-                                                
-                                                        <Typography
-                                                            variant="small"
-                                                            color="blue-gray"
-                                                            className="font-normal opacity-70"
-                                                        >
-                                                            {referecia}
-                                                        </Typography>
-                                                
-                                               
+                                                <Typography
+
+                                                    variant="small"
+                                                    color="blue-gray"
+                                                    className="font-normal opacity-70"
+                                                >
+                                                    {referencia}
+                                                </Typography>
                                             </div>
                                         </td>
                                         <td className={classes}>
-                                            <div className="flex flex-col">
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-normal"
+                                            >
+                                                {descripcion}
+                                            </Typography>
+                                        </td>
+                                        <td className={classes}>
+                                            <Link href={`./equipos/${encodeURIComponent(id)}` } className='text-yellow-700'>
                                                 <Typography
                                                     variant="small"
-                                                    color="blue-gray"
+                                                    // color="blue-gray"
                                                     className="font-normal"
                                                 >
-                                                    {descripcion}
+                                                    {serial}
                                                 </Typography>
-                                                
-                                            </div>
+                                            </Link>
+                                        </td>
+                                        <td className={classes}>
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-normal"
+                                            >
+                                                {marca}
+                                            </Typography>
+                                        </td>
+                                        <td className={classes}>
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-normal"
+                                            >
+                                                {fechaFactura}
+                                            </Typography>
+                                        </td>
+                                        <td className={classes}>
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-normal"
+                                            >
+                                                {creadoPor}
+                                            </Typography>
+                                        </td>
+                                        <td className={classes}>
+                                            <Typography
+                                                variant="small"
+                                                color="blue-gray"
+                                                className="font-normal"
+                                            >
+                                                {modificadoPor}
+                                            </Typography>
                                         </td>
                                         <td className={classes}>
                                             <div className="w-max">
@@ -304,22 +329,6 @@ export function SortableTable() {
                                                     color={online ? "green" : "blue-gray"}
                                                 />
                                             </div>
-                                        </td>
-                                        <td className={classes}>
-                                            <Typography
-                                                variant="small"
-                                                color="blue-gray"
-                                                className="font-normal"
-                                            >
-                                                {date}
-                                            </Typography>
-                                        </td>
-                                        <td className={classes}>
-                                            <Tooltip content="Editar Usuario">
-                                                <IconButton variant="text">
-                                                    <PencilIcon className="h-4 w-4" />
-                                                </IconButton>
-                                            </Tooltip>
                                         </td>
                                     </tr>
                                 );
@@ -334,13 +343,16 @@ export function SortableTable() {
                 </Typography>
                 <div className="flex gap-2">
                     <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>
-                        Anteriror
+                        Anterior
                     </Button>
                     <Button className='bg-yellow-500 text-black' size="sm" onClick={handleNextPage}>
                         Siguiente
                     </Button>
                 </div>
             </CardFooter>
+
+
+
         </Card>
     );
 }

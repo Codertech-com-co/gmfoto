@@ -6,38 +6,7 @@ const Input = ({ name, register, rules, label, ...props }) => {
 
   return (
     <>
-      {/* <input
-        {...(register && register(name, rules))}
-        id={name}
-        className={`
-                    block 
-                    w-full
-                    rounded-lg 
-                    py-1.5  
-                    shadow-sm 
-                    ring-0 
-                    ring-inset 
-                    ring-transparent 
-                    placeholder:text-gray-400 
-                    focus:ring-1 
-                    p-3
-                    bg-gray-100
-                    border-none
-                    focus:ring-inset 
-                    focus:ring-yellow-200
-                    sm:text-sm 
-                    sm:leading-6
-                    outline-none
-                    dark:bg-gray-800
-                    dark:ring-gray-700
-                    ${
-                      type === "radio"
-                        ? "w-[12px] border-none bg-transparent outline-none p-0"
-                        : "w-full"
-                    }
-                `}
-        {...props}
-      /> */}
+ 
 
       <div class="">
         <div class="relative w-full  h-10">

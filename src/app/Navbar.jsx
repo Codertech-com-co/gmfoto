@@ -10,8 +10,10 @@ import {
   ListItem,
   Menu,
   MenuHandler,
+  Avatar,
   MenuList,
   MenuItem,
+  Button
 } from "@material-tailwind/react";
 import {
   ChevronDownIcon,
@@ -46,7 +48,7 @@ const navListMenuItems = [
     href:"/orders"
   },
   {
-    title: "Equipos",
+    title: "Equipos Externos",
     description: "Cree, Modifique y Busque",
     icon: RectangleGroupIcon,
     href:"/equipos"
@@ -170,7 +172,20 @@ function NavList() {
         <ListItem className="flex items-center gap-2 py-2 pr-4" to="sad">
           Soporte
         </ListItem>
+        
       </Typography>
+      <Menu>
+      <MenuHandler>
+       
+          
+          <Avatar src="https://docs.material-tailwind.com/img/face-2.jpg" size="sm" className="cursor-pointer"/>
+       
+      </MenuHandler>
+      <MenuList>
+        <MenuItem>Perfil</MenuItem>
+        <MenuItem className="text-red-600">Cerrar sesion</MenuItem>
+      </MenuList>
+    </Menu>
     </List>
   );
 }
