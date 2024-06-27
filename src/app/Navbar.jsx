@@ -115,7 +115,7 @@ function NavListMenu() {
         <MenuHandler>
           <Typography as="div" variant="small" className="font-medium">
             <ListItem
-              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900"
+              className="flex items-center gap-2 py-2 pr-4 font-medium text-gray-900 dark:text-white"
               selected={isMenuOpen || isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen((cur) => !cur)}
             >
@@ -158,7 +158,7 @@ function NavList() {
         color="blue-gray"
         className="font-medium"
       >
-        <ListItem className="flex items-center gap-2 py-2 pr-4" >Inicio</ListItem>
+        <ListItem className="flex items-center gap-2 py-2 pr-4 dark:text-white" >Inicio</ListItem>
       </Typography>
       <NavListMenu />
       <Typography
@@ -169,7 +169,7 @@ function NavList() {
         color="blue-gray"
         className="font-medium"
       >
-        <ListItem className="flex items-center gap-2 py-2 pr-4" to="sad">
+        <ListItem className="flex items-center gap-2 py-2 pr-4 dark:text-white" to="sad">
           Soporte
         </ListItem>
         
@@ -201,16 +201,16 @@ export default function MegaMenuWithHover() {
   }, []);
 
   return (
-    <div className="w-full h-full">
-      <Navbar className="mx-auto max-w-screen-xl px-4 py-2 shadow-none">
-        <div className="flex items-center justify-between text-blue-gray-900">
+    <div className="w-full h-full ">
+      <Navbar className="mx-auto max-w-screen-xl px-4 py-2 shadow-none dark:bg-black border-none">
+        <div className="flex items-center justify-between text-blue-gray-900 dark:text-white">
           <Typography
             as="a"
             href="/"
             variant="h5"
             className="mr-4 cursor-pointer py-1.5 lg:ml-2"
           >
-            <Image src={'/images/logo.png'} width={'100'} height={'80'}/>
+            <Image src={'/images/logo.png'} className="dark:invert" width={'100'} height={'80'}/>
           </Typography>
           <div className="hidden lg:block">
             <NavList />

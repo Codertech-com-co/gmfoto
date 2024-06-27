@@ -11,9 +11,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
+  const date = new Date()
+  const year = date.getFullYear()
+
   return (
     <html lang="es">
-      <body className={inter.className}>
+      <body className={`${inter.className} dark:bg-gray-900`}>
         <Navbar></Navbar>
 
         <div className="h-full w-full md:w-[75%] m-auto mt-5 shadow-none p-5">
@@ -21,7 +24,7 @@ export default function RootLayout({ children }) {
         </div>
 
         <footer className="text-center items-end text-black">
-          <small>CoderTech © 2024</small>
+          <small>CoderTech © {year}</small>
         </footer>
 
       </body>

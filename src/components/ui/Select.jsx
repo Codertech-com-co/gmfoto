@@ -23,7 +23,7 @@ const Select2 = ({ name, register, rules, options, label, ...props }) => {
         ))}
       </select>
       <label
-        className={`absolute left-2 top-2 text-blue-gray-700 transition-all duration-200 ease-in-out transform origin-top-left pointer-events-none peer-placeholder-shown:-translate-y-0.5 peer-placeholder-shown:scale-100 peer-focus:-translate-y-3 peer-focus:scale-75 ${value ? '-translate-y-3 scale-75' : ''}`}
+        className={`absolute left-2 top-4 text-blue-gray-700 transition-all duration-200 ease-in-out transform origin-top-left pointer-events-none peer-placeholder-shown:-translate-y-0.5 peer-placeholder-shown:scale-100 peer-focus:-translate-y-3 peer-focus:scale-75 ${value ? '-translate-y-3 scale-75' : ''}`}
       >
         {label}
       </label>

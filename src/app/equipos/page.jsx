@@ -26,6 +26,7 @@ import {
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
 import { fetchEquipos } from '../../utils/api/equipos';
+import datetimeToDate from '../../../libs/datetimeToDate'
 
    
 
@@ -179,14 +180,14 @@ export function SortableTable() {
     }
 
     return (
-        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
-            <CardHeader floated={false} shadow={false} className="rounded-none">
+        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 dark:bg-black">
+            <CardHeader floated={false} shadow={false} className="rounded-none dark:bg-black">
                 <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
-                        <Typography variant="h5" color="blue-gray">
+                        <Typography variant="h5" color="blue-gray" className=' dark:text-white'>
                             Lista de Equipos
                         </Typography>
-                        <Typography color="gray" className="mt-1 font-normal">
+                        <Typography color="gray" className="mt-1 font-normal dark:text-white">
                             Ver información sobre todos los equipos externos
                         </Typography>
                     </div>
@@ -219,7 +220,7 @@ export function SortableTable() {
                 <Button variant='outlined' className='border-yellow-500 text-black' size='sm'>Exportar Datos</Button>
             </CardHeader>
             <CardBody className="overflow-auto px-0">
-                <table className="mt-4 w-full min-w-max table-auto text-left">
+                <table className="mt-4 w-full min-w-max table-auto text-left dark:text-white" >
                     <thead>
                         <tr>
                             {TABLE_HEAD.map((head, index) => (
@@ -299,7 +300,7 @@ export function SortableTable() {
                                                 color="blue-gray"
                                                 className="font-normal"
                                             >
-                                                {fechaFactura}
+                                                {datetimeToDate(fechaFactura)}
                                             </Typography>
                                         </td>
                                         <td className={classes}>

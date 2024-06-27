@@ -4,7 +4,7 @@ import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
-import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
+import { PencilIcon, UserPlusIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import {
     Card,
     CardHeader,
@@ -24,6 +24,10 @@ import {
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
 
+
+import { Dialog, DialogHeader, DialogBody, DialogFooter } from '@material-tailwind/react';
+
+
 const TABS = [
     {
         label: "Todos",
@@ -39,11 +43,11 @@ const TABS = [
     },
 ];
 
-const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura","Creado por","Modificado por"];
+const TABLE_HEAD = ["Consecutivo", "Etapa", "Tipo", "Cliente", "Fecha Creacion", "Creado por", ""];
 
 const TABLE_ROWS = [
     {
-        img: "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/team-3.jpg",
+        Consecutivo: "1",
         name: "John Michael",
         email: "john@creative-tim.com",
         job: "Manager",
@@ -56,7 +60,29 @@ const TABLE_ROWS = [
 
 const ROWS_PER_PAGE = 10;
 
+// const PdfModal = ({ open, handleOpen }) => {
+//     return (
+//         <Dialog open={open} handler={handleOpen} size="xl">
+//             {/* <DialogHeader>Vista Previa del PDF</DialogHeader> */}
+//             <DialogBody divider>
+//                 <PDFViewer width="100%" height="500">
+//                     <MyDocument />
+//                 </PDFViewer>
+//             </DialogBody>
+//             <DialogFooter>
+//                 <Button color="red" onClick={handleOpen} ripple="dark">
+//                     Cerrar
+//                 </Button>
+//             </DialogFooter>
+//         </Dialog>
+//     );
+// };
+
 export function SortableTable() {
+
+    const [open, setOpen] = useState(false);
+
+    const handleOpen = () => setOpen(!open);
 
     const [loading, setLoading] = useState(true);
 
@@ -129,7 +155,7 @@ export function SortableTable() {
         console.log(value.toString())
         setStatus(value.toString());
     };
-    
+
 
     const paginatedRows = useMemo(() => {
         setLoading(true);
@@ -143,18 +169,18 @@ export function SortableTable() {
 
     if (loading) {
         return <LoadingPage />;
-      }
-      
+    }
+
 
     return (
-        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
-            <CardHeader floated={false} shadow={false} className="rounded-none">
+        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 dark:bg-black dark:border-gray-700">
+            <CardHeader floated={false} shadow={false} className="rounded-none dark:bg-black">
                 <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
-                        <Typography variant="h5" color="blue-gray">
+                        <Typography variant="h5" color="blue-gray" className='dark:text-white'>
                             Ordenes de Servicio
                         </Typography>
-                        <Typography color="gray" className="mt-1 font-normal">
+                        <Typography color="gray" className="mt-1 font-normal dark:text-white">
                             Ver información sobre todas las ordenes de servicio
                         </Typography>
                     </div>
@@ -162,7 +188,7 @@ export function SortableTable() {
                         {/* <Button variant="outlined" size="sm">
                             view all
                         </Button> */}
-                        <Link href={"clients/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
+                        <Link href={"orders/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Orden
                         </Link>
                     </div>
@@ -187,10 +213,10 @@ export function SortableTable() {
                 </div>
 
                 <br />
-                <Button variant='outlined' className='border-yellow-500 text-balnk' size='sm'>Exportar Datos</Button>
+                <Button variant='outlined' className='border-yellow-500 text-balnk dark:text-white' size='sm'>Exportar Datos</Button>
             </CardHeader>
             <CardBody className="overflow-auto px-0">
-                <table className="mt-4 w-full min-w-max table-auto text-left">
+                <table className="mt-4 w-full min-w-max table-auto text-left dark:border-gray-700">
                     <thead>
                         <tr>
                             {TABLE_HEAD.map((head, index) => (
@@ -202,7 +228,7 @@ export function SortableTable() {
                                     <Typography
                                         variant="small"
                                         color="blue-gray"
-                                        className="flex items-center justify-between gap-2 font-normal leading-none opacity-70"
+                                        className="flex items-center justify-between gap-2 font-normal leading-none opacity-70 dark:text-white"
                                     >
                                         {head}{" "}
                                         {index !== TABLE_HEAD.length - 1 && (
@@ -215,7 +241,7 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ img, name, email, job, org, online, date }, index) => {
+                            ({ Consecutivo, name, email, job, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -225,23 +251,18 @@ export function SortableTable() {
                                     <tr key={name}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
-                                                <Avatar src={img} alt={name} size="sm" />
+                                               
                                                 <div className="flex flex-col">
-                                                    <Typography
-                                                        variant="small"
-                                                        color="blue-gray"
-                                                        className="font-normal"
-                                                    >
-                                                        {name}
-                                                    </Typography>
-                                                    <Tooltip content="Redacte un Correo">
-                                                        <Typography
+                                                    
+                                                    <Tooltip content="Editar Orden">
+                                                        <Link
+                                                        href={'orders/1'}
                                                             variant="small"
-                                                            color="blue-gray"
-                                                            className="font-normal opacity-70"
+                                                            
+                                                            className="font-normal opacity-70 text-yellow-800 border-b-2 dark:text-white"
                                                         >
-                                                            <a href={"https://mail.google.com/mail/?view=cm&fs=1&to=" + email} target='_blanck'>{email}</a>
-                                                        </Typography>
+                                                            OS-{Consecutivo}
+                                                        </Link>
                                                     </Tooltip>
                                                 </div>
                                             </div>
@@ -251,14 +272,14 @@ export function SortableTable() {
                                                 <Typography
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal"
+                                                    className="font-normal dark:text-white"
                                                 >
                                                     {job}
                                                 </Typography>
                                                 <Typography
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal opacity-70"
+                                                    className="font-normal opacity-70 dark:text-white"
                                                 >
                                                     {org}
                                                 </Typography>
@@ -278,17 +299,24 @@ export function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal dark:text-white"
                                             >
                                                 {date}
                                             </Typography>
                                         </td>
+                                        <td></td>
+                                        <td></td>
                                         <td className={classes}>
-                                            <Tooltip content="Editar Usuario">
+                                            <Tooltip content="Generar impresion">
+                                                <Link
+                                                href={'orders/1/document'}>
                                                 <IconButton variant="text">
-                                                    <PencilIcon className="h-4 w-4" />
+                                                    <DocumentIcon className="h-4 w-4 dark:text-white" />
                                                 </IconButton>
+                                                </Link>
+                                               
                                             </Tooltip>
+                                            
                                         </td>
                                     </tr>
                                 );
@@ -298,14 +326,14 @@ export function SortableTable() {
                 </table>
             </CardBody>
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                <Typography variant="small" color="blue-gray" className="font-normal">
+                <Typography variant="small" color="blue-gray" className="font-normal dark:text-white">
                     Pagina {currentPage} de {totalPages}
                 </Typography>
                 <div className="flex gap-2">
-                    <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>
+                    <Button variant="outlined" className='border-yellow-500 dark:text-white' size="sm" onClick={handlePreviousPage}>
                         Anteriror
                     </Button>
-                    <Button className='bg-yellow-500 text-black' size="sm" onClick={handleNextPage}>
+                    <Button className='bg-yellow-500 text-black ' size="sm" onClick={handleNextPage}>
                         Siguiente
                     </Button>
                 </div>
