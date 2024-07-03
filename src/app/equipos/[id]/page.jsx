@@ -1,15 +1,15 @@
 "use client";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
+import Select from "../../../components/ui/Select2";
 import Textarea from "../../../components/ui/Textarea";
 import { Button } from "@material-tailwind/react";
 import { Breadcrumbs } from "@material-tailwind/react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import {
   Accordion,
   AccordionHeader,
@@ -24,7 +24,10 @@ const fetchClientData = async (idEquipo) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${idEquipo}`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/equipos/${idEquipo}`,
+    requestOptions
+  );
   const result = await response.json();
   return result[0];
 };
@@ -37,9 +40,13 @@ const updateClientData = async (idEquipo, data) => {
     },
     body: JSON.stringify(data),
     redirect: "follow",
+    credentials: "include",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${idEquipo}`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/equipos/${idEquipo}`,
+    requestOptions
+  );
   const result = await response.json();
   return result;
 };
@@ -51,35 +58,49 @@ const insertClientData = async (data) => {
     },
     body: JSON.stringify(data),
     redirect: "follow",
+    credentials: "include",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/clients/`,
+    requestOptions
+  );
   const result = await response.json();
   return result;
 };
 
 export default function ClientForm({ params }) {
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
   const [client, setClient] = useState(null);
+  const [marca, setMarca] = useState(null);
   const idEquipo = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
   const router = useRouter();
 
+ 
   useEffect(() => {
     const loadClientData = async () => {
       const clientData = await fetchClientData(idEquipo);
       setClient(clientData);
-
+      setMarca(clientData.marca)
+      
       // Resetear el formulario con los datos del cliente
       reset(clientData);
     };
 
     loadClientData();
   }, [idEquipo, reset]);
+  
 
   const onSubmit = async (data) => {
-    // console.log(data);
+    console.log(data);
     try {
-      if (idEquipo == 'create') {
+      if (idEquipo == "create") {
         const insert = await insertClientData(data);
       } else {
         const updatedClient = await updateClientData(idEquipo, data);
@@ -93,10 +114,9 @@ export default function ClientForm({ params }) {
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: false,
-
-      })
+      });
       setTimeout(() => {
-        router.push('/clients');
+        router.push('/equipos');
       }, 500)
 
       // console.log("Cliente actualizado:", updatedClient);
@@ -109,8 +129,7 @@ export default function ClientForm({ params }) {
         showConfirmButton: false,
         timer: 5000,
         timerProgressBar: false,
-
-      })
+      });
       // console.error("Error actualizando cliente:", error);
     }
   };
@@ -128,15 +147,14 @@ export default function ClientForm({ params }) {
           Equipo
         </button>
       </Breadcrumbs>
-      <h2 className="font-bold text-2xl text-black mt-5">Información del equipo</h2>
-      <small className=" text-black">
-        Complete el siguiente formulario
-      </small>
+      <h2 className="font-bold text-2xl text-black mt-5">
+        Información del equipo
+      </h2>
+      <small className=" text-black">Complete el siguiente formulario</small>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
+        className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2 bg-white"
       >
-
         <Input
           label="Referencia"
           name="referencia"
@@ -152,78 +170,93 @@ export default function ClientForm({ params }) {
           errors={errors}
         />
         <Select
-          label={'Marca'}
-          name={'marca'}
+          label={"Marca"}
+          name={"marca"}
+          setValue={setValue}
+          value={marca}
           register={register}
           rules={{ required: true }}
-          options={[{
-            label: "NIKON",
-            value: "NIKON"
-          }
-            , {
-            label: "CANON",
-            value: "CANON"
-          }
-            , {
-            label: "SONY",
-            value: "SONY"
-          }
-            , {
-            label: "FUJIFILM",
-            value: "FUJIFILM"
-          }
-            , {
-            label: "OLYMPUS",
-            value: "OLYMPUS"
-          }
-            , {
-            label: "PENTAX",
-            value: "PENTAX"
-          }
-            , {
-            label: "CASIO",
-            value: "CASIO"
-          }
-            , {
-            label: "HONOR",
-            value: "HONOR"
-          }
-
-          ]} />
+          options={[
+            {
+              label: "NIKON",
+              value: "NIKON",
+            },
+            {
+              label: "CANON",
+              value: "CANON",
+            },
+            {
+              label: "SONY",
+              value: "SONY",
+            },
+            {
+              label: "FUJIFILM",
+              value: "FUJIFILM",
+            },
+            {
+              label: "OLYMPUS",
+              value: "OLYMPUS",
+            },
+            {
+              label: "PENTAX",
+              value: "PENTAX",
+            },
+            {
+              label: "CASIO",
+              value: "CASIO",
+            },
+            {
+              label: "HONOR",
+              value: "HONOR",
+            },
+            {
+              label: "XIAOMI",
+              value: "XIAOMI",
+            },
+          ]}
+        />
 
         <Textarea
-          label={'Descripcion'}
-          name={'descripcion'}
+          label={"Descripcion"}
+          name={"descripcion"}
           register={register}
-          rules={{ required: true }} />
+          rules={{ required: false }}
+        />
         <Textarea
-          label={'Observaciones'}
-          name={'observaciones'}
+          label={"Observaciones"}
+          name={"observaciones"}
           register={register}
-          rules={{ required: true }} />
+          rules={{ required: false }}
+        />
         <Input
-          label={'Fecha Factura'}
-          name={'fecha_factura'}
+          label={"Fecha Factura"}
+          name={"fecha_factura"}
           register={register}
-          rules={{ required: true }} 
-          type="date"/>
-
-
+          rules={{ required: false }}
+          type="date"
+        />
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Link href="../equipos" className="m-2 text-black">Cancelar</Link>
-          <Button type="submit" color="yellow" className="m-2">Guardar</Button>
-
+          <Link href="../equipos" className="m-2 text-black">
+            Cancelar
+          </Link>
+          <Button type="submit" color="yellow" className="m-2">
+            Guardar
+          </Button>
         </div>
       </form>
 
-      {idEquipo !== 'create' && (
-        <div className='mt-5 border-2 border-dashed rounded-lg p-5'>
-          <small className='text-blue-gray-800 text-xl'>Detalle</small>
-          <Accordion open={open === 1} >
-            <AccordionHeader onClick={() => handleOpen(1)}>Ordenes de Servicio</AccordionHeader>
+      {idEquipo !== "create" && (
+        <div className="mt-5 border-2 border-dashed rounded-lg p-5">
+          <small className="text-blue-gray-800 text-xl">Detalle</small>
+          <Accordion open={open === 1}>
+            <AccordionHeader onClick={() => handleOpen(1)}>
+              Ordenes de Servicio
+            </AccordionHeader>
             <AccordionBody>
-              <Button color="yellow" className="m-2">Nuevo</Button>
+              <Link href={"../orders/create"} color="yellow" className="m-2">
+                Nuevo
+              </Link>
             </AccordionBody>
           </Accordion>
           {/* <Accordion open={open === 2}>

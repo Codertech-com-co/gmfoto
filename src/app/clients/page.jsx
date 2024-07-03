@@ -243,7 +243,7 @@ export default function SortableTable() {
     }
 
     return (
-        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5">
+        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 bg-white">
             <CardHeader floated={false} shadow={false} className="rounded-none">
                 <div className="mb-8 flex items-center justify-between gap-8">
                     <div>

@@ -1,21 +1,31 @@
 "use client";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select";
+import Select from "../../../components/ui/Select2";
 import Textarea from "../../../components/ui/Textarea";
 import { Button } from "@material-tailwind/react";
 import { Breadcrumbs } from "@material-tailwind/react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import {
   Accordion,
   AccordionHeader,
   AccordionBody,
-  Typography
+  Typography,
 } from "@material-tailwind/react";
+import { fetchClients } from "../../../utils/api/clients";
+import { fetchEquipos } from "../../../utils/api/equipos";
+import {
+  Tabs,
+  TabsHeader,
+  TabsBody,
+  Tab,
+  TabPanel,
+} from "@material-tailwind/react";
+// import Select from "react-tailwindcss-select";
 
 const MySwal = withReactContent(Swal);
 
@@ -25,7 +35,10 @@ const fetchClientData = async (idEquipo) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${idEquipo}`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/clients/${idEquipo}`,
+    requestOptions
+  );
   const result = await response.json();
   return result[0];
 };
@@ -40,7 +53,10 @@ const updateClientData = async (idEquipo, data) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${idEquipo}`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/clients/${idEquipo}`,
+    requestOptions
+  );
   const result = await response.json();
   return result;
 };
@@ -54,36 +70,63 @@ const insertClientData = async (data) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/`, requestOptions);
+  const response = await fetch(
+    `http://127.0.0.1:3001/clients/`,
+    requestOptions
+  );
   const result = await response.json();
   return result;
 };
 
-export default function ClientForm({ params }) {
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
+function ClientForm({ params }) {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
   const [client, setClient] = useState(null);
   const idEquipo = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
   const router = useRouter();
+  const [clients, setClients] = useState([]);
+  const [equipos, setEquipos] = useState([]);
 
   useEffect(() => {
     const loadClientData = async () => {
-      const clientData = await fetchClientData(idEquipo);
-      setClient(clientData);
+      var listClients = await fetchClients();
+      listClients = listClients.map((data) => {
+        return {
+          label: data.razonSocial,
+          value: data.id,
+        };
+      });
+      setClients(listClients);
+      var listEquipos = await fetchEquipos();
+      listEquipos = listEquipos.map((data) => {
+        return {
+          label: data.serial,
+          value: data.id,
+        };
+      });
+      setEquipos(listEquipos);
+
+      // setClient(clientData);
 
       // Resetear el formulario con los datos del cliente
-      reset(clientData);
+      // reset(clientData);
     };
 
     loadClientData();
   }, [idEquipo, reset]);
 
   const onSubmit = async (data) => {
-    // console.log(data);
+    console.log(data);
     try {
-      if (idEquipo == 'create') {
-        const insert = await insertClientData(data);
+      if (idEquipo == "create") {
+        // const insert = await insertClientData(data);
       } else {
-        const updatedClient = await updateClientData(idEquipo, data);
+        // const updatedClient = await updateClientData(idEquipo, data);
       }
 
       MySwal.fire({
@@ -94,11 +137,10 @@ export default function ClientForm({ params }) {
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: false,
-
-      })
+      });
       setTimeout(() => {
-        router.push('/clients');
-      }, 500)
+        // router.push('/clients');
+      }, 500);
 
       // console.log("Cliente actualizado:", updatedClient);
     } catch (error) {
@@ -110,8 +152,7 @@ export default function ClientForm({ params }) {
         showConfirmButton: false,
         timer: 5000,
         timerProgressBar: false,
-
-      })
+      });
       // console.error("Error actualizando cliente:", error);
     }
   };
@@ -121,16 +162,10 @@ export default function ClientForm({ params }) {
 
   return (
     <div>
-      <Breadcrumbs>
-        <Link href="/orders" className="opacity-60 hover:text-yellow-900">
-          Lista Ordenes
-        </Link>
-        <button className="opacity-60" disabled>
-          Orden
-        </button>
-      </Breadcrumbs>
-      <h2 className="font-bold text-2xl text-black mt-5">Orden de compra</h2>
-      <small className=" text-black">
+      <h2 className="font-bold text-2xl text-blue-gray-800 mt-5">
+        Orden de servicio
+      </h2>
+      <small className="text-blue-gray-800">
         Complete el siguiente formulario
       </small>
       <form
@@ -138,27 +173,31 @@ export default function ClientForm({ params }) {
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
         <Select
-          label={'Area'}
+          label={"Area"}
           options={[
             {
               label: "Servicio Técnico",
-              value: "servicio_tecnico"
-            }
-          ]} />
+              value: "servicio_tecnico",
+              selected: true,
+            },
+          ]}
+        />
         <Select
-          label={'Tipo'}
+          label={"Tipo"}
           options={[
             {
               label: "Garantía",
-              value: "garantia"
+              value: "garantia",
             },
             {
               label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
+              value: "fuera_de_garantia",
+            },
+          ]}
+        />
         <Select
-          label={'Etapa'}
+          label={"Etapa"}
+          primaryColor={"amber"}
           options={[
             {
               label: "Nuevo",
@@ -184,124 +223,280 @@ export default function ClientForm({ params }) {
               label: "Cotizado",
               value: "cotizado",
             },
-          ]} />
+          ]}
+        />
 
         <br />
-        <Typography className='text-blue-gray-700' variant='h4'>Datos Cliente</Typography>
+        <Typography className="text-blue-gray-700" variant="h4">
+          Datos Cliente
+        </Typography>
         <br />
         <Select
-          label={'Cliente'}
-          options={[
-            {
-              label: "Garantía",
-              value: "garantia"
-            },
-            {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
-
+          label="Cliente"
+          name="client"
+          register={register}
+          setValue={setValue}
+          rules={{ required: true }}
+          errors={errors}
+          options={clients}
+        />
 
         <br />
-        <Typography className='text-blue-gray-700' variant='h4'>Datos del producto</Typography>
+        <Typography className="text-blue-gray-700" variant="h4">
+          Datos del producto
+        </Typography>
+        <br />
+        <Select
+          label="Equipo"
+          name="equipo"
+          register={register}
+          setValue={setValue}
+          rules={{ required: true }}
+          errors={errors}
+          options={equipos}
+        />
+
         <br />
         <Textarea
-        label={'Accesorios'}/>
-        <Textarea
-        label={'Falla Reportada'}/>
+          name="accesorios"
+          register={register}
+          rules={{ required: true }}
+          errors={errors}
+          label={"Accesorios"}
+        />
+        <Textarea label={"Falla Reportada"} />
         <Select
-          label={'Proceso Logístico'}
+          label={"Proceso Logístico"}
           options={[
             {
-              label: "Garantía",
-              value: "garantia"
+              label: "Recolección domicilio",
+              value: "recoleccion_domicilio",
             },
             {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
+              label: "Recolección transportadora",
+              value: "recoleccion_transportadora",
+            },
+            {
+              label: "Recolección Cota",
+              value: "recoleccion_cota",
+            },
+            {
+              label: "Recolección StaFé Btá",
+              value: "recoleccion_stafe_bogota",
+            },
+            {
+              label: "Recolección StaFé Mde",
+              value: "recoleccion_stafe_mde",
+            },
+            {
+              label: "Recolección Fabricato",
+              value: "recoleccion_fabricato",
+            },
+            {
+              label: "Recolección Gran Estación",
+              value: "recoleccion_gran_estacion",
+            },
+            {
+              label: "Recolección Plaza Claro",
+              value: "recoleccion_plaza_claro",
+            },
+          ]}
+        />
         <Select
-          label={'Persona que recibe el Producto'}
+          label={"Persona que recibe el Producto"}
           options={[
             {
-              label: "Garantía",
-              value: "garantia"
+              label: "Duvan Camilo Ayala",
+              value: "123456789",
             },
-            {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
+          ]}
+        />
         <Select
-          label={'Transportadora'}
+          label={"Transportadora"}
           options={[
             {
-              label: "Garantía",
-              value: "garantia"
+              label: "TCC",
+              value: "TCC",
             },
             {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
-          <Input
-          label={'Guía de Envió'}/>
-          <Select
-          label={'Estado del Producto'}
+              label: "SERVIENTREGA",
+              value: "SERVIENTREGA",
+            },
+            {
+              label: "INTERRAPIDISIMO",
+              value: "INTERRAPIDISIMO",
+            },
+            {
+              label: "COORDINADORA",
+              value: "COORDINADORA",
+            },
+            {
+              label: "ENVIA",
+              value: "ENVIA",
+            },
+            {
+              label: "DEPRISA",
+              value: "DEPRISA",
+            },
+          ]}
+        />
+        <Input label={"Guía de Envió"} />
+        <Select
+          label={"Estado del Producto"}
+          isMultiple={true}
           options={[
             {
-              label: "Garantía",
-              value: "garantia"
+              label: "POR VALIDAR",
+              value: "POR_VALIDAR",
             },
             {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia"
-            }
-          ]} />
+              label: "BUEN ESTADO",
+              value: "BUEN_ESTADO",
+            },
+            {
+              label: "DEFORMADO",
+              value: "DEFORMADO",
+            },
+            {
+              label: "LCD AVERIADO",
+              value: "LCD_AVERIADO",
+            },
+            {
+              label: "GOLPEADO",
+              value: "GOLPEADO",
+            },
+            {
+              label: "RAYADO",
+              value: "RAYADO",
+            },
+          ]}
+        />
 
+        <br />
+        <Typography className="text-blue-gray-700" variant="h4">
+          INFORMACIÓN DE SERVICIO TECNICO
+        </Typography>
+        <br />
 
+        <Textarea label={"Diagnostico"} name={"diagnostico"} />
+        <Textarea label={"Repuestos a Importar"} name={"repuestosImportar"} />
 
+        <Select
+          label={"Requiere Importación"}
+          options={[
+            {
+              label: "SI",
+              value: "SI",
+            },
+            {
+              label: "NO",
+              value: "NO",
+            },
+          ]}
+        />
+
+        <Textarea label={"Observaciones"} name={"observaciones"} />
+
+        <Input label={'Fecha cierre'} type='datetime-local' name={'fechaCierre'}/>
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Link href="../equipos" className="m-2 text-black">Cancelar</Link>
-          <Button type="submit" color="yellow" className="m-2">Guardar</Button>
-
+          <Link href="../equipos" className="m-2 text-black">
+            Cancelar
+          </Link>
+          <Button type="submit" color="yellow" className="m-2">
+            Guardar
+          </Button>
         </div>
       </form>
-
-      {idEquipo !== 'create' && (
-        <div className='mt-5 border-2 border-dashed rounded-lg p-5'>
-          <small className='text-blue-gray-800 text-xl'>Detalle</small>
-          <Accordion open={open === 1} >
-            <AccordionHeader onClick={() => handleOpen(1)}>Ordenes de Servicio</AccordionHeader>
-            <AccordionBody>
-              <Button color="yellow" className="m-2">Nuevo</Button>
-            </AccordionBody>
-          </Accordion>
-          {/* <Accordion open={open === 2}>
-            <AccordionHeader onClick={() => handleOpen(2)}>
-              How to use Material Tailwind?
-            </AccordionHeader>
-            <AccordionBody>
-              We&apos;re not always in the position that we want to be at. We&apos;re constantly
-              growing. We&apos;re constantly making mistakes. We&apos;re constantly trying to express
-              ourselves and actualize our dreams.
-            </AccordionBody>
-          </Accordion>
-          <Accordion open={open === 3}>
-            <AccordionHeader onClick={() => handleOpen(3)}>
-              What can I do with Material Tailwind?
-            </AccordionHeader>
-            <AccordionBody>
-              We&apos;re not always in the position that we want to be at. We&apos;re constantly
-              growing. We&apos;re constantly making mistakes. We&apos;re constantly trying to express
-              ourselves and actualize our dreams.
-            </AccordionBody>
-          </Accordion> */}
-        </div>
-      )}
     </div>
+  );
+}
+
+function Bitacora({ params }) {
+  return (
+    <div className="h-[80vh] mt-5">
+      <Typography variant="h4">Bitácora</Typography>
+      <br />
+      <Button color="white" className="float-right">
+        Agregar labor
+      </Button>
+      <br />
+
+      <table className="w-full   text-center">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Técnico</th>
+            <th>Labor realizada</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1.</td>
+            <td className="p-3">
+              <Select label={""} options={[]} />
+            </td>
+            <td className="p-3">
+              <Textarea label={""} />
+            </td>
+            <td>
+              <Button color="red">Eliminar</Button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export default function TabsCustomAnimation({ params }) {
+  const data = [
+    {
+      label: "Información Basica Y Equipo",
+      value: "info",
+      desc: <ClientForm params />,
+    },
+    {
+      label: "Bitácora de labores realizadas",
+      value: "bitacora",
+      desc: <Bitacora params />,
+    },
+  ];
+
+  return (
+    <>
+      <Breadcrumbs>
+        <Link href="/orders" className="opacity-60 hover:text-yellow-900">
+          Lista Ordenes
+        </Link>
+        <button className="opacity-60" disabled>
+          Orden
+        </button>
+      </Breadcrumbs>
+      <br />
+      <Tabs id="custom-animation" value="info">
+        <TabsHeader>
+          {data.map(({ label, value }) => (
+            <Tab key={value} value={value}>
+              {label}
+            </Tab>
+          ))}
+        </TabsHeader>
+        <TabsBody
+          animate={{
+            initial: { y: 250 },
+            mount: { y: 0 },
+            unmount: { y: 250 },
+          }}
+        >
+          {data.map(({ value, desc }) => (
+            <TabPanel key={value} value={value}>
+              {desc}
+            </TabPanel>
+          ))}
+        </TabsBody>
+      </Tabs>
+    </>
   );
 }

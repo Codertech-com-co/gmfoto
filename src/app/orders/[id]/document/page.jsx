@@ -1,5 +1,5 @@
 "use client"
-import { Page, Text, View, Document, StyleSheet, Image } from '@react-pdf/renderer';
+import { Page, Text, View, Document, StyleSheet, Image,Font  } from '@react-pdf/renderer';
 import { Breadcrumbs, Button } from "@material-tailwind/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -11,10 +11,30 @@ const PDFViewer = dynamic(
   },
 );
 
+
+// Registrar la fuente con negrita
+Font.register({
+  family: 'Poppins',
+  fonts: [
+    { src: '/fonts/Poppins-Regular.ttf', fontWeight: 'normal' },
+    { src: '/fonts/Poppins-Bold.ttf', fontWeight: 'bold' },
+    { src: '/fonts/Poppins-Italic.ttf', fontWeight: 'italic' },
+    { src: '/fonts/Poppins-BoldItalic.ttf', fontWeight: 'bolditalic' },
+    { src: '/fonts/Poppins-Light.ttf', fontWeight: 'light' },
+    { src: '/fonts/Poppins-LightItalic.ttf', fontWeight: 'lightitalic' },
+    { src: '/fonts/Poppins-Medium.ttf', fontWeight: 'medium' },
+    { src: '/fonts/Poppins-MediumItalic.ttf', fontWeight: 'mediumitalic' },
+    { src: '/fonts/Poppins-SemiBold.ttf', fontWeight: 'semibold' },
+    { src: '/fonts/Poppins-SemiBoldItalic.ttf', fontWeight: 'semibolditalic' },
+    { src: '/fonts/Poppins-Thin.ttf', fontWeight: 'thin' },
+    { src: '/fonts/Poppins-ThinItalic.ttf', fontWeight: 'thinitalic' },
+  ],
+});
 // Create styles
 const styles = StyleSheet.create({
   page: {
     // fontFamily: 'Arial',
+    fontFamily: 'Poppins',
     fontSize: 12,
     padding: 20,
   },
@@ -23,7 +43,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 0,
   },
   logo: {
     width: 100,
@@ -50,6 +70,10 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 8,
+    marginLeft: 5
+  },
+  bold: {
+    fontSize: 8,
     fontWeight: "bold",
     marginLeft: 5
   },
@@ -57,7 +81,7 @@ const styles = StyleSheet.create({
     fontSize: 7,
     borderStyle:'dashed',
     border: "1px solid #c0c0c0",
-    padding: 5,
+    padding: 3,
     borderRadius: 5,
     flex: 1,
     marginLeft: 5
@@ -66,8 +90,8 @@ const styles = StyleSheet.create({
     borderStyle:'dashed',
     border: "1px solid #c0c0c0",
     flex: 1,
-    padding: 5,
-    minHeight: 50,
+    padding: 3,
+    minHeight: 35,
     borderRadius: 10,
     fontSize: 7,
     marginLeft: 5
@@ -98,7 +122,7 @@ function MyDocument(props) {
             <ProductInfo />
             <ServiceInfo />
             <Authorization />
-            <Text style={{ textAlign: "center", fontSize:8 }}>NO PRESTAMOS SERVICIO DE SOPORTE A GARANTIAS EXTENDIDAS QUE NO HAYAN SIDO EMITIDAS POR "MN FOTO S.A.S."</Text>
+            <Text style={{ textAlign: "center", fontSize:8 }}>SOLO PRESTAMOS SERVICIO DE GARANTIAS PARA MN FOTO SAS Y/O SH AMERICAS</Text>
           </Page>
         </Document>
       </PDFViewer>
@@ -315,14 +339,14 @@ const Authorization = () => {
     <View style={styles.row} >
 
       <View  style={{flex:1, border:'1px solid #c0c0c0',borderStyle:'dashed',padding:10,borderRadius:15,margin:3, textAlign:'left'}}>
-        <Text style={styles.label}>AUTORIZACIÓN DE ENTREGA DEL PRODUCTO A TERCEROS.</Text>
-        <Text style={{ fontWeight: 600, textAlign: 'left', marginTop: 10, fontSize: 8, marginBottom: 8 }}>
+        <Text style={styles.bold} >AUTORIZACIÓN DE ENTREGA DEL PRODUCTO A TERCEROS.</Text>
+        <Text style={{  textAlign: 'left', marginTop: 10, fontSize: 8, marginBottom: 8 }}>
         Bajo mi responsabilidad, yo,_________________________________________
 ______________________________identificado con documento de identidad
 N°___________________________________autorizo la entrega del producto
 relacionado en esta orden de servicio a:_____________________________
 ________________________________________identificado con documento de
-identidad N°_________________________________________________________
+identidad N°_________________
         </Text>
 
         <Text style={{ fontSize: 6 }}>*Adjuntar copias del documento de identidad.
@@ -339,8 +363,8 @@ identidad N°_________________________________________________________
 
       </View>
       <View  style={{flex:1, border:'1px solid #c0c0c0',borderStyle:'dashed',padding:10,borderRadius:15,margin:3}}>
-        <Text style={{fontSize:9}}>RECIBIDO A CONFORMIDAD</Text>
-        <Text style={{marginTop:90}}>_______________________________________</Text>
+        <Text style={styles.bold}>RECIBIDO A CONFORMIDAD</Text>
+        <Text style={{marginTop:90}}>____________________</Text>
         <Text style={{fontSize:9}}>FIRMA-NOMBRE-CEDULA</Text>
 
 

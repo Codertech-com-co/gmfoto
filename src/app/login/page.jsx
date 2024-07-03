@@ -1,16 +1,49 @@
 "use client";
+import { useState } from "react";
 import Image from "next/image";
 import Input from "@/components/ui/Input";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+  const [errorApi, setErrorApi] = useState("");
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const onSubmit = (data) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify(data);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+      credentials: 'include'
+    };
+
+    fetch("http://127.0.0.1:3001/auth/login", requestOptions)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw await response.json();
+        }
+        router.push('/')
+        return response.json();
+      })
+      .then((result) => {
+        console.log(result);
+      })
+      .catch((error) => {
+        console.log(error);
+        setErrorApi(error.message);
+      });
+  };
   return (
     <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-2">
       <div className="relative hidden lg:block ">
@@ -30,11 +63,11 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <div className="flex items-center justify-center bg-white px-4 py-12 dark:bg-gray-950">
+      <div className="flex items-center justify-center bg-white px-4 py-12 dark:bg-gray-950 dark:bg-black">
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="flex items-center justify-center">
             <CameraIcon className="h-8 w-8 text-primary" />
-            <span className="ml-2 text-2xl font-bold">GMFOTO</span>
+            <span className="ml-2 text-2xl font-bold ">GMFOTO</span>
           </div>
           <div className="space-y-2">
             <h2 className="text-3xl font-bold">Iniciar sesión</h2>
@@ -44,23 +77,25 @@ export default function Home() {
           </div>
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <label htmlFor="username">Usuario</label>
               <Input
+                label={"Correo Electronico"}
                 register={register}
-                name={"username"}
+                name={"email"}
                 rules={{ required: true }}
-                id="username"
+                id="email"
                 type="text"
                 autocomplete="off"
-                placeholder="Ingresa tu usuario"
+                placeholder="Ingresa tu correo"
               />
               {errors.username?.type === "required" && (
-                <p role="alert" className="text-red-400 text-sm">Usuario es requerido</p>
+                <p role="alert" className="text-red-400 text-sm">
+                  Usuario es requerido
+                </p>
               )}
             </div>
             <div>
-              <label htmlFor="password">Contraseña</label>
               <Input
+                label={"Contraseña"}
                 register={register}
                 name={"password"}
                 rules={{ required: true }}
@@ -70,7 +105,9 @@ export default function Home() {
                 placeholder="Ingresa tu contraseña"
               />
               {errors.password?.type === "required" && (
-                <p role="alert" className="text-red-400 text-sm">Contraseña es requerida</p>
+                <p role="alert" className="text-red-400 text-sm">
+                  Contraseña es requerida
+                </p>
               )}
             </div>
             <div className="flex items-center justify-between">
@@ -78,6 +115,11 @@ export default function Home() {
                 Iniciar sesión
               </button>
             </div>
+
+            <div className="text-center">
+              <b className="text-red-700">{errorApi}</b>
+            </div>
+
             <div className="text-center text-sm text-gray-500 dark:text-gray-400">
               <Link
                 href="/recoverPassword"

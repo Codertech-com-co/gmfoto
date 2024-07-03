@@ -3,6 +3,7 @@ import React from 'react';
 const Select2 = ({ name, register, rules, options, label, ...props }) => {
   const [value, setValue] = React.useState("");
   const handleChange = (event) => {
+    
     setValue(event.target.value);
   };
 
@@ -17,7 +18,7 @@ const Select2 = ({ name, register, rules, options, label, ...props }) => {
       >
         <option value="" hidden></option>
         {options.map(option => (
-          <option key={option.value} value={option.value}>
+          <option key={option.value} value={option.value} selected={option.selected?true:false}>
             {option.label}
           </option>
         ))}

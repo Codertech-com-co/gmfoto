@@ -38,15 +38,15 @@ const TABS = [
     },
     {
         label: "Online",
-        value: true,
+        value: 'SI',
     },
     {
         label: "Offline",
-        value: false,
+        value: 'NO',
     },
 ];
 
-const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura", "Creado por", "Modificado por"];
+const TABLE_HEAD = ["Referencia", "Descripción", "Serial", "Marca", "Fecha Factura", "Creado por", "Modificado por","Status"];
 
 const ROWS_PER_PAGE = 10;
 
@@ -73,10 +73,10 @@ export function SortableTable() {
                 descripcion: client.descripcion,
                 serial: client.serial,
                 marca: client.marca,
-                fechaFactura: client.fecha_factura,
-                creadoPor: client.creadoPor,
-                modificadoPor: client.modificadoPor,
-                online: client.online,  // Supongo que hay un campo para el estado online/offline
+                fecha_factura: client.fecha_factura,
+                creado_por: client.creado_por,
+                modificado_por: client.modificado_por,
+                online: client.activo,  // Supongo que hay un campo para el estado online/offline
             }));
             setTableRows(dataTable);
             setLoading(false);
@@ -180,14 +180,14 @@ export function SortableTable() {
     }
 
     return (
-        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 dark:bg-black">
-            <CardHeader floated={false} shadow={false} className="rounded-none dark:bg-black">
+        <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 ">
+            <CardHeader floated={false} shadow={false} className="rounded-none ">
                 <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
-                        <Typography variant="h5" color="blue-gray" className=' dark:text-white'>
+                        <Typography variant="h5" color="blue-gray" className=' '>
                             Lista de Equipos
                         </Typography>
-                        <Typography color="gray" className="mt-1 font-normal dark:text-white">
+                        <Typography color="gray" className="mt-1 font-normal ">
                             Ver información sobre todos los equipos externos
                         </Typography>
                     </div>
@@ -245,7 +245,7 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ id, referencia, descripcion, serial, marca, fechaFactura, creadoPor, modificadoPor, online }, index) => {
+                            ({ id, referencia, descripcion, serial, marca, fecha_factura, creado_por, modificado_por, online }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -300,7 +300,7 @@ export function SortableTable() {
                                                 color="blue-gray"
                                                 className="font-normal"
                                             >
-                                                {datetimeToDate(fechaFactura)}
+                                                {datetimeToDate(fecha_factura)}
                                             </Typography>
                                         </td>
                                         <td className={classes}>
@@ -309,7 +309,7 @@ export function SortableTable() {
                                                 color="blue-gray"
                                                 className="font-normal"
                                             >
-                                                {creadoPor}
+                                                {creado_por}
                                             </Typography>
                                         </td>
                                         <td className={classes}>
@@ -318,7 +318,7 @@ export function SortableTable() {
                                                 color="blue-gray"
                                                 className="font-normal"
                                             >
-                                                {modificadoPor}
+                                                {modificado_por}
                                             </Typography>
                                         </td>
                                         <td className={classes}>
@@ -326,8 +326,8 @@ export function SortableTable() {
                                                 <Chip
                                                     variant="ghost"
                                                     size="sm"
-                                                    value={online ? "online" : "offline"}
-                                                    color={online ? "green" : "blue-gray"}
+                                                    value={online =='SI' ? "online" : "offline"}
+                                                    color={online =='SI'? "green" : "blue-gray"}
                                                 />
                                             </div>
                                         </td>

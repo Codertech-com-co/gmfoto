@@ -124,7 +124,7 @@ export default function ClientForm({ params }) {
       </small>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
+        className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2 bg-white"
       >
         <b className='text-black col-span-2'>Datos Empresa</b>
         <Input
