@@ -1,5 +1,6 @@
 "use client"
 import { Page, Text, View, Document, StyleSheet, Image,Font  } from '@react-pdf/renderer';
+import { useEffect, useState } from "react";
 import { Breadcrumbs, Button } from "@material-tailwind/react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -98,9 +99,36 @@ const styles = StyleSheet.create({
   },
 });
 
+const fetchClientData = async (idEquipo) => {
+  const requestOptions = {
+    method: "GET",
+    redirect: "follow",
+  };
+
+  const response = await fetch(
+    `http://127.0.0.1:3001/orders/${idEquipo}`,
+    requestOptions
+  );
+  const result = await response.json();
+  return result[0];
+};
+
+
 // Create Document Component
 function MyDocument(props) {
   const id = props.params.id
+  const [data , setData] = useState(null)
+
+  useEffect(() => {
+    const loadClientData = async () => {
+      const clientData = await fetchClientData(id);
+      setData(clientData);
+      
+     
+    };
+
+    loadClientData();
+  }, [id]);
 
 
   return (
@@ -119,7 +147,7 @@ function MyDocument(props) {
           <Page size="Legal" style={styles.page}>
             <Header />
             <CustomerInfo />
-            <ProductInfo />
+            <ProductInfo data={data}/>
             <ServiceInfo />
             <Authorization />
             <Text style={{ textAlign: "center", fontSize:8 }}>SOLO PRESTAMOS SERVICIO DE GARANTIAS PARA MN FOTO SAS Y/O SH AMERICAS</Text>
@@ -230,7 +258,9 @@ const CustomerInfo = () => {
   );
 };
 
-const ProductInfo = () => {
+const ProductInfo = (data) => {
+  console.log(data)
+  
   return (
     <View style={styles.section}>
       <Text style={styles.label}>DATOS DEL PRODUCTO</Text>
@@ -251,7 +281,7 @@ const ProductInfo = () => {
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Accesorios:</Text>
-          <Text style={styles.textArea}>duvanmunoz38@gmail.com</Text>
+          <Text style={styles.textArea}>{data.data.accesorios}</Text>
         </View>
       </View>
       <View style={styles.row} >

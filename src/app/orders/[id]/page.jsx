@@ -78,7 +78,7 @@ const insertClientData = async (data) => {
   return result;
 };
 
-function ClientForm({ params }) {
+const ClientForm = ({ params }) => {
   const {
     register,
     handleSubmit,
@@ -95,20 +95,17 @@ function ClientForm({ params }) {
   useEffect(() => {
     const loadClientData = async () => {
       var listClients = await fetchClients();
-      listClients = listClients.map((data) => {
-        return {
-          label: data.razonSocial,
-          value: data.id,
-        };
-      });
+      listClients = listClients.map((data) => ({
+        label: data.razonSocial,
+        value: data.id,
+      }));
       setClients(listClients);
+
       var listEquipos = await fetchEquipos();
-      listEquipos = listEquipos.map((data) => {
-        return {
-          label: data.serial,
-          value: data.id,
-        };
-      });
+      listEquipos = listEquipos.map((data) => ({
+        label: data.serial,
+        value: data.id,
+      }));
       setEquipos(listEquipos);
 
       // setClient(clientData);
@@ -121,19 +118,20 @@ function ClientForm({ params }) {
   }, [idEquipo, reset]);
 
   const onSubmit = async (data) => {
-    console.log(data);
+    console.log('Form data:', data); // Asegúrate de que esto se ejecute
+
     try {
-      if (idEquipo == "create") {
+      if (idEquipo === 'create') {
         // const insert = await insertClientData(data);
       } else {
         // const updatedClient = await updateClientData(idEquipo, data);
       }
 
       MySwal.fire({
-        title: "Datos Guardados",
-        icon: "success",
+        title: 'Datos Guardados',
+        icon: 'success',
         toast: true,
-        position: "bottom",
+        position: 'bottom',
         showConfirmButton: false,
         timer: 3000,
         timerProgressBar: false,
@@ -142,98 +140,73 @@ function ClientForm({ params }) {
         // router.push('/clients');
       }, 500);
 
-      // console.log("Cliente actualizado:", updatedClient);
+      // console.log('Cliente actualizado:', updatedClient);
     } catch (error) {
       MySwal.fire({
-        title: "Error actualizando cliente",
-        icon: "error",
+        title: 'Error actualizando cliente',
+        icon: 'error',
         toast: true,
-        position: "bottom",
+        position: 'bottom',
         showConfirmButton: false,
         timer: 5000,
         timerProgressBar: false,
       });
-      // console.error("Error actualizando cliente:", error);
+      // console.error('Error actualizando cliente:', error);
     }
   };
-  const [open, setOpen] = useState(0);
-
-  const handleOpen = (value) => setOpen(open === value ? 0 : value);
 
   return (
     <div>
-      <h2 className="font-bold text-2xl text-blue-gray-800 mt-5">
-        Orden de servicio
-      </h2>
-      <small className="text-blue-gray-800">
-        Complete el siguiente formulario
-      </small>
+      <h2 className="font-bold text-2xl text-blue-gray-800 mt-5">Orden de servicio</h2>
+      <small className="text-blue-gray-800">Complete el siguiente formulario</small>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
         <Select
-          label={"Area"}
+          label="Area"
+          name="area"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "Servicio Técnico",
-              value: "servicio_tecnico",
-              selected: true,
-            },
+            { label: 'Servicio Técnico', value: 'servicio_tecnico', selected: true },
           ]}
         />
         <Select
-          label={"Tipo"}
+          label="Tipo"
+          name="tipo"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "Garantía",
-              value: "garantia",
-            },
-            {
-              label: "Fuera de Garantía",
-              value: "fuera_de_garantia",
-            },
+            { label: 'Garantía', value: 'garantia' },
+            { label: 'Fuera de Garantía', value: 'fuera_de_garantia' },
           ]}
         />
         <Select
-          label={"Etapa"}
-          primaryColor={"amber"}
+          label="Etapa"
+          name="etapa"
+          register={register}
+          rules={{ required: true }}
+          primaryColor="amber"
+          setValue={setValue}
           options={[
-            {
-              label: "Nuevo",
-              value: "nuevo",
-            },
-            {
-              label: "Asignado",
-              value: "asignado",
-            },
-            {
-              label: "En proceso",
-              value: "en_proceso",
-            },
-            {
-              label: "Ejecutado",
-              value: "ejecutado",
-            },
-            {
-              label: "Cerrado",
-              value: "cerrado",
-            },
-            {
-              label: "Cotizado",
-              value: "cotizado",
-            },
+            { label: 'Nuevo', value: 'nuevo' },
+            { label: 'Asignado', value: 'asignado' },
+            { label: 'En proceso', value: 'en_proceso' },
+            { label: 'Ejecutado', value: 'ejecutado' },
+            { label: 'Cerrado', value: 'cerrado' },
+            { label: 'Cotizado', value: 'cotizado' },
           ]}
         />
 
         <br />
-        <Typography className="text-blue-gray-700" variant="h4">
-          Datos Cliente
-        </Typography>
+        <Typography className="text-blue-gray-700" variant="h4">Datos Cliente</Typography>
         <br />
         <Select
           label="Cliente"
-          name="client"
+          name="cliente"
           register={register}
           setValue={setValue}
           rules={{ required: true }}
@@ -242,9 +215,7 @@ function ClientForm({ params }) {
         />
 
         <br />
-        <Typography className="text-blue-gray-700" variant="h4">
-          Datos del producto
-        </Typography>
+        <Typography className="text-blue-gray-700" variant="h4">Datos del producto</Typography>
         <br />
         <Select
           label="Equipo"
@@ -262,142 +233,118 @@ function ClientForm({ params }) {
           register={register}
           rules={{ required: true }}
           errors={errors}
-          label={"Accesorios"}
+          label="Accesorios"
         />
-        <Textarea label={"Falla Reportada"} />
+        <Textarea
+          label="Falla Reportada"
+          name="falla_reportada"
+          register={register}
+          rules={{ required: false }}
+        />
         <Select
-          label={"Proceso Logístico"}
+          label="Proceso Logístico"
+          name="proceso_logistico"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "Recolección domicilio",
-              value: "recoleccion_domicilio",
-            },
-            {
-              label: "Recolección transportadora",
-              value: "recoleccion_transportadora",
-            },
-            {
-              label: "Recolección Cota",
-              value: "recoleccion_cota",
-            },
-            {
-              label: "Recolección StaFé Btá",
-              value: "recoleccion_stafe_bogota",
-            },
-            {
-              label: "Recolección StaFé Mde",
-              value: "recoleccion_stafe_mde",
-            },
-            {
-              label: "Recolección Fabricato",
-              value: "recoleccion_fabricato",
-            },
-            {
-              label: "Recolección Gran Estación",
-              value: "recoleccion_gran_estacion",
-            },
-            {
-              label: "Recolección Plaza Claro",
-              value: "recoleccion_plaza_claro",
-            },
+            { label: 'Recolección domicilio', value: 'recoleccion_domicilio' },
+            { label: 'Recolección transportadora', value: 'recoleccion_transportadora' },
+            { label: 'Recolección Cota', value: 'recoleccion_cota' },
+            { label: 'Recolección StaFé Btá', value: 'recoleccion_stafe_bogota' },
+            { label: 'Recolección StaFé Mde', value: 'recoleccion_stafe_mde' },
+            { label: 'Recolección Fabricato', value: 'recoleccion_fabricato' },
+            { label: 'Recolección Gran Estación', value: 'recoleccion_gran_estacion' },
+            { label: 'Recolección Plaza Claro', value: 'recoleccion_plaza_claro' },
           ]}
         />
         <Select
-          label={"Persona que recibe el Producto"}
+          label="Persona que recibe el Producto"
+          name="persona_que_recibe"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "Duvan Camilo Ayala",
-              value: "123456789",
-            },
+            { label: 'Duvan Camilo Ayala', value: '123456789' },
           ]}
         />
         <Select
-          label={"Transportadora"}
+          label="Transportadora"
+          name="transportadora"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "TCC",
-              value: "TCC",
-            },
-            {
-              label: "SERVIENTREGA",
-              value: "SERVIENTREGA",
-            },
-            {
-              label: "INTERRAPIDISIMO",
-              value: "INTERRAPIDISIMO",
-            },
-            {
-              label: "COORDINADORA",
-              value: "COORDINADORA",
-            },
-            {
-              label: "ENVIA",
-              value: "ENVIA",
-            },
-            {
-              label: "DEPRISA",
-              value: "DEPRISA",
-            },
+            { label: 'TCC', value: 'TCC' },
+            { label: 'SERVIENTREGA', value: 'SERVIENTREGA' },
+            { label: 'INTERRAPIDISIMO', value: 'INTERRAPIDISIMO' },
+            { label: 'COORDINADORA', value: 'COORDINADORA' },
+            { label: 'ENVIA', value: 'ENVIA' },
+            { label: 'DEPRISA', value: 'DEPRISA' },
           ]}
         />
-        <Input label={"Guía de Envió"} />
+        <Input
+          label="Guía de Envió"
+          name="guia"
+          register={register}
+          rules={{ required: false }}
+        />
         <Select
-          label={"Estado del Producto"}
+          label="Estado del Producto"
+          name="estado_del_producto"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           isMultiple={true}
           options={[
-            {
-              label: "POR VALIDAR",
-              value: "POR_VALIDAR",
-            },
-            {
-              label: "BUEN ESTADO",
-              value: "BUEN_ESTADO",
-            },
-            {
-              label: "DEFORMADO",
-              value: "DEFORMADO",
-            },
-            {
-              label: "LCD AVERIADO",
-              value: "LCD_AVERIADO",
-            },
-            {
-              label: "GOLPEADO",
-              value: "GOLPEADO",
-            },
-            {
-              label: "RAYADO",
-              value: "RAYADO",
-            },
+            { label: 'POR VALIDAR', value: 'POR_VALIDAR' },
+            { label: 'BUEN ESTADO', value: 'BUEN_ESTADO' },
+            { label: 'DEFORMADO', value: 'DEFORMADO' },
+            { label: 'LCD AVERIADO', value: 'LCD_AVERIADO' },
+            { label: 'GOLPEADO', value: 'GOLPEADO' },
+            { label: 'RAYADO', value: 'RAYADO' },
           ]}
         />
 
         <br />
-        <Typography className="text-blue-gray-700" variant="h4">
-          INFORMACIÓN DE SERVICIO TECNICO
-        </Typography>
+        <Typography className="text-blue-gray-700" variant="h4">INFORMACIÓN DE SERVICIO TECNICO</Typography>
         <br />
 
-        <Textarea label={"Diagnostico"} name={"diagnostico"} />
-        <Textarea label={"Repuestos a Importar"} name={"repuestosImportar"} />
+        <Textarea
+          label="Diagnostico"
+          name="diagnostico"
+          register={register}
+        />
+        <Textarea
+          label="Repuestos a Importar"
+          name="repuestosImportar"
+          register={register}
+        />
 
         <Select
-          label={"Requiere Importación"}
+          label="Requiere Importación"
+          name="requiere_importacion"
+          register={register}
+          rules={{ required: true }}
+          setValue={setValue}
           options={[
-            {
-              label: "SI",
-              value: "SI",
-            },
-            {
-              label: "NO",
-              value: "NO",
-            },
+            { label: 'SI', value: 'SI' },
+            { label: 'NO', value: 'NO' },
           ]}
         />
 
-        <Textarea label={"Observaciones"} name={"observaciones"} />
+        <Textarea
+          label="Observaciones"
+          name="observaciones"
+          register={register}
+        />
 
-        <Input label={'Fecha cierre'} type='datetime-local' name={'fechaCierre'}/>
+        <Input
+          label="Fecha cierre"
+          type="datetime-local"
+          name="fechaCierre"
+          register={register}
+        />
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
           <Link href="../equipos" className="m-2 text-black">
@@ -410,8 +357,7 @@ function ClientForm({ params }) {
       </form>
     </div>
   );
-}
-
+};
 function Bitacora({ params }) {
   return (
     <div className="h-[80vh] mt-5">

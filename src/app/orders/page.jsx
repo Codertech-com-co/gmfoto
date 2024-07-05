@@ -1,9 +1,11 @@
 "use client"
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState,useEffect } from 'react';
 import {
     MagnifyingGlassIcon,
     ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 import { PencilIcon, UserPlusIcon, DocumentIcon } from "@heroicons/react/24/solid";
 import {
     Card,
@@ -23,10 +25,11 @@ import {
 } from "@material-tailwind/react";
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
+import {fetchOrders} from '../../utils/api/orders'
 
 
 import { Dialog, DialogHeader, DialogBody, DialogFooter } from '@material-tailwind/react';
-
+const MySwal = withReactContent(Swal);
 
 const TABS = [
     {
@@ -45,18 +48,18 @@ const TABS = [
 
 const TABLE_HEAD = ["Consecutivo", "Etapa", "Tipo", "Cliente", "Fecha Creacion", "Creado por", ""];
 
-const TABLE_ROWS = [
-    {
-        Consecutivo: "1",
-        name: "John Michael",
-        email: "john@creative-tim.com",
-        job: "Manager",
-        org: "Organization",
-        online: true,
-        date: "23/04/18",
-        date: "23/04/18",
-    }
-];
+// const TABLE_ROWS = [
+//     {
+//         Consecutivo: "1",
+//         name: "John Michael",
+//         email: "john@creative-tim.com",
+//         job: "Manager",
+//         org: "Organization",
+//         online: true,
+//         date: "23/04/18",
+//         date: "23/04/18",
+//     }
+// ];
 
 const ROWS_PER_PAGE = 10;
 
@@ -85,13 +88,52 @@ export function SortableTable() {
     const handleOpen = () => setOpen(!open);
 
     const [loading, setLoading] = useState(true);
-
+    const [TABLE_ROWS, setTableRows] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [search, setSearch] = useState('');
     const [sortColumn, setSortColumn] = useState('');
     const [sortDirection, setSortDirection] = useState('asc');
     const [status, setStatus] = useState('all');
     const totalPages = useMemo(() => Math.ceil(TABLE_ROWS.length / ROWS_PER_PAGE), []);
+
+
+    const fetchData = async () => {
+        try {
+           
+            setLoading(true);
+            const data = await fetchOrders();
+            const dataTable = data.map(client => ({
+                id: client.id,
+                referencia: client.referencia,
+                descripcion: client.descripcion,
+                serial: client.serial,
+                marca: client.marca,
+                fecha_factura: client.fecha_factura,
+                creado_por: client.creado_por,
+                modificado_por: client.modificado_por,
+                online: client.activo,  // Supongo que hay un campo para el estado online/offline
+            }));
+            setTableRows(dataTable);
+            setLoading(false);
+
+            MySwal.fire({
+                title: "Lista actualizada",
+                icon: "success",
+                toast: true,
+                position: "bottom",
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: false,
+            })
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
 
     const handlePreviousPage = () => {
         if (currentPage > 1) {
@@ -112,7 +154,7 @@ export function SortableTable() {
 
     const handleSort = (column) => {
         const columnMapping = {
-            Cliente: 'name',
+            id: 'id',
             Empresa: 'org',
             Status: 'online',
             Creado: 'date',
@@ -241,7 +283,7 @@ export function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ Consecutivo, name, email, job, org, online, date }, index) => {
+                            ({ id, name, email, job, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -261,7 +303,7 @@ export function SortableTable() {
                                                             
                                                             className="font-normal opacity-70 text-yellow-800 border-b-2 dark:text-white"
                                                         >
-                                                            OS-{Consecutivo}
+                                                            OS-{id}
                                                         </Link>
                                                     </Tooltip>
                                                 </div>
@@ -309,7 +351,7 @@ export function SortableTable() {
                                         <td className={classes}>
                                             <Tooltip content="Generar impresion">
                                                 <Link
-                                                href={'orders/1/document'}>
+                                                href={'orders/'+id+'/document'}>
                                                 <IconButton variant="text">
                                                     <DocumentIcon className="h-4 w-4 dark:text-white" />
                                                 </IconButton>
