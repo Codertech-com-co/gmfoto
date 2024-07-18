@@ -1,4 +1,5 @@
 "use client";
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
 import { useState } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -29,7 +30,7 @@ export default function RootLayout({ children }) {
     credentials: 'include'
   };
 
-  fetch("http://127.0.0.1:3001/auth/validate", requestOptions)
+  fetch(API_BASE_URL+"/auth/validate", requestOptions)
     .then(async (response) => {
       if (!response.ok) {
         throw await response.json();
