@@ -32,6 +32,14 @@ import {
   UserGroupIcon,
 } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import Cookies from 'js-cookie';
+
+
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
+
 
 
 const navListMenuItems = [
@@ -53,12 +61,12 @@ const navListMenuItems = [
     icon: RectangleGroupIcon,
     href:"/equipos"
   },
-  {
-    title: "Inventario",
-    description: "Cree, Modifique y Busque",
-    icon: SquaresPlusIcon,
-    href:"/inventory"
-  },
+  // {
+  //   title: "Inventario",
+  //   description: "Cree, Modifique y Busque",
+  //   icon: SquaresPlusIcon,
+  //   href:"/inventory"
+  // },
   {
     title: "Comunicación",
     description: "Crea recordatorios y notifica a tus clientes",
@@ -69,7 +77,10 @@ const navListMenuItems = [
 
 
 
+
+
 function NavListMenu() {
+  
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const renderItems = navListMenuItems.map(
@@ -149,6 +160,22 @@ function NavListMenu() {
 }
 
 function NavList() {
+  const router = useRouter();
+  const cerrarSesion = () =>{
+
+    MySwal.fire({
+      title:"¿Desea cerrar sesion?",
+      icon:"question",
+      showCancelButton: true,
+  
+    }).then(data =>{
+      if(data.isConfirmed){
+        Cookies.remove('auth_token')
+        router.push('./login')
+      }
+    })
+  
+  }
   return (
     <List className="mt-4 mb-6 p-0 lg:mt-0 lg:mb-0 lg:flex-row lg:p-1">
       <Typography
@@ -183,7 +210,7 @@ function NavList() {
       </MenuHandler>
       <MenuList>
         <MenuItem>Perfil</MenuItem>
-        <MenuItem className="text-red-600">Cerrar sesion</MenuItem>
+        <MenuItem className="text-red-600" onClick={()=>{cerrarSesion()}}>Cerrar sesion</MenuItem>
       </MenuList>
     </Menu>
     </List>

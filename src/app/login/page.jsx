@@ -1,4 +1,5 @@
 "use client";
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
 import { useState } from "react";
 import Image from "next/image";
 import Input from "@/components/ui/Input";
@@ -28,7 +29,7 @@ export default function Home() {
       credentials: 'include'
     };
 
-    fetch("http://127.0.0.1:3001/auth/login", requestOptions)
+    fetch(API_BASE_URL+"/auth/login", requestOptions)
       .then(async (response) => {
         if (!response.ok) {
           throw await response.json();

@@ -2,11 +2,11 @@ import React, { useEffect } from "react";
 import Select from "react-tailwindcss-select";
 
 function buscarPorValue(data, value) {
-  return data.filter(item => item.value === value);
+  return data ? data.filter(item => item.value === value) : [];
 }
 
 const Select2 = ({ name, register, rules, options, label, setValue, ...props }) => {
-  const [value, setValueLocal] = React.useState();
+  const [value, setValueLocal] = React.useState(null);
 
   const handleChange = (selectedOption) => {
     setValueLocal(selectedOption);
@@ -14,12 +14,26 @@ const Select2 = ({ name, register, rules, options, label, setValue, ...props }) 
   };
 
   useEffect(() => {
-    const val = buscarPorValue(options, props.value);
-    if (val.length > 0) {
-      setValueLocal(val[0]);
-      setValue(name, val[0].value); // Update value in useForm
+    if (props.value && props.value.includes('[') || Array.isArray(props.value)) {
+      var parsedValue
+      if(Array.isArray(props.value)) {
+         parsedValue = props.value;
+      } else {
+         parsedValue = JSON.parse(props.value);
+      }
+      
+      console.log(parsedValue)
+      const dataValue = parsedValue.map(data => buscarPorValue(options, data)[0]).filter(Boolean);
+      setValueLocal(dataValue);
+      setValue(name, props.value);
+    } else {
+      const val = buscarPorValue(options, props.value);
+      if (val.length > 0) {
+        setValueLocal(val[0]);
+        setValue(name, val[0].value); // Update value in useForm
+      }
     }
-  }, [options, name, setValue]);
+  }, [options, props.value, name, setValue]);
 
   return (
     <div>

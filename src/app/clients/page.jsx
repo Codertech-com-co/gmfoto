@@ -1,4 +1,5 @@
 "use client";
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -46,7 +47,7 @@ const TABS = [
     },
 ];
 
-const TABLE_HEAD = ["Cliente", "Empresa", "Status", "Creado", ""];
+const TABLE_HEAD = ["Cliente", "Empresa","Identificación", "Status", "Creado", ""];
 
 const ROWS_PER_PAGE = 10;
 
@@ -69,6 +70,7 @@ export default function SortableTable() {
                 name: client.nombrePersonaContacto,
                 owner: client.propietario,
                 email: client.email,
+                documento: client.documento,
                 job: client.nombrePersonaContacto,
                 org: client.NombreEstablecimiento,
                 online: true,
@@ -77,16 +79,16 @@ export default function SortableTable() {
             setTableRows(dataTable);
             setLoading(false);
 
-            MySwal.fire({
-                title: "Lista actualizada",
-                icon: "success",
-                toast: true,
-                position: "bottom",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
+            // MySwal.fire({
+            //     title: "Lista actualizada",
+            //     icon: "success",
+            //     toast: true,
+            //     position: "bottom",
+            //     showConfirmButton: false,
+            //     timer: 3000,
+            //     timerProgressBar: false,
 
-            })
+            // })
         } catch (error) {
             console.error('Error fetching data:', error);
             setLoading(false);
@@ -193,7 +195,7 @@ export default function SortableTable() {
                         redirect: "follow"
                     };
 
-                    var result = await fetch("http://127.0.0.1:3001/clients/" + id, requestOptions)
+                    var result = await fetch(API_BASE_URL+"/clients/" + id, requestOptions)
                         .then((response) => response.json())
                         .then((result) => {
                            
@@ -280,7 +282,7 @@ export default function SortableTable() {
                 </div>
                 <br />
                 <Button variant='outlined' className='border-yellow-500 text-black m-2' onClick={() => fetchData()} size='sm'>Actualizar</Button>
-                <Button variant='outlined' className='border-yellow-500 text-black m-2' size='sm'>Exportar Datos</Button>
+                {/* <Button variant='outlined' className='border-yellow-500 text-black m-2' size='sm'>Exportar Datos</Button> */}
             </CardHeader>
             <CardBody className="overflow-auto px-0">
                 <table className="mt-4 w-full min-w-max table-auto text-left">
@@ -308,7 +310,7 @@ export default function SortableTable() {
                     </thead>
                     <tbody>
                         {paginatedRows.map(
-                            ({ id, img, name, email, job, owner, org, online, date }, index) => {
+                            ({ id, img, name, email,documento, job, owner, org, online, date }, index) => {
                                 const isLast = index === paginatedRows.length - 1;
                                 const classes = isLast
                                     ? "p-4"
@@ -318,7 +320,7 @@ export default function SortableTable() {
                                     <tr key={name}>
                                         <td className={classes}>
                                             <div className="flex items-center gap-3">
-                                                <Avatar src={img} alt={name} size="sm" />
+                                                {/* <Avatar src={img} alt={name} size="sm" /> */}
                                                 <div className="flex flex-col">
                                                     <Typography
                                                         variant="small"
@@ -354,6 +356,18 @@ export default function SortableTable() {
                                                     className="font-normal opacity-70"
                                                 >
                                                     {org}
+                                                </Typography>
+                                            </div>
+                                        </td>
+                                        <td className={classes}>
+                                            <div className="flex flex-col">
+                                                
+                                                <Typography
+                                                    variant="small"
+                                                    color="blue-gray"
+                                                    className="font-normal opacity-70"
+                                                >
+                                                    {documento}
                                                 </Typography>
                                             </div>
                                         </td>
@@ -398,6 +412,8 @@ export default function SortableTable() {
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                 <Typography variant="small" color="blue-gray" className="font-normal">
                     Página {currentPage} de {totalPages}
+                    <br />
+                    Total registros {TABLE_ROWS.length}
                 </Typography>
                 <div className="flex gap-2">
                     <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>

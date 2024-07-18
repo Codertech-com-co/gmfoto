@@ -1,4 +1,5 @@
 "use client"
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
 import { Page, Text, View, Document, StyleSheet, Image,Font  } from '@react-pdf/renderer';
 import { useEffect, useState } from "react";
 import { Breadcrumbs, Button } from "@material-tailwind/react";
@@ -106,7 +107,7 @@ const fetchClientData = async (idEquipo) => {
   };
 
   const response = await fetch(
-    `http://127.0.0.1:3001/orders/${idEquipo}`,
+    `${API_BASE_URL}/orders/${idEquipo}`,
     requestOptions
   );
   const result = await response.json();
@@ -116,20 +117,21 @@ const fetchClientData = async (idEquipo) => {
 
 // Create Document Component
 function MyDocument(props) {
-  const id = props.params.id
-  const [data , setData] = useState(null)
+  const id = props.params.id;
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     const loadClientData = async () => {
       const clientData = await fetchClientData(id);
       setData(clientData);
-      
-     
     };
 
     loadClientData();
   }, [id]);
 
+  if (!data) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <>
@@ -146,9 +148,9 @@ function MyDocument(props) {
         <Document title={id} author='CoderTech'>
           <Page size="Legal" style={styles.page}>
             <Header />
-            <CustomerInfo />
+            <CustomerInfo data={data}/>
             <ProductInfo data={data}/>
-            <ServiceInfo />
+            <ServiceInfo data={data}/>
             <Authorization />
             <Text style={{ textAlign: "center", fontSize:8 }}>SOLO PRESTAMOS SERVICIO DE GARANTIAS PARA MN FOTO SAS Y/O SH AMERICAS</Text>
           </Page>
@@ -199,7 +201,8 @@ const Header = () => {
 };
 
 
-const CustomerInfo = () => {
+const CustomerInfo = (data) => {
+ 
   return (
     <View style={styles.section}>
       <Text style={styles.label}>DATOS DEL CLIENTE</Text>
@@ -242,7 +245,7 @@ const CustomerInfo = () => {
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Guia de Envio:</Text>
-          <Text style={styles.input}>456489743135</Text>
+          <Text style={styles.input}>{data.data.guia}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Transportadora:</Text>
@@ -259,7 +262,7 @@ const CustomerInfo = () => {
 };
 
 const ProductInfo = (data) => {
-  console.log(data)
+  
   
   return (
     <View style={styles.section}>
@@ -287,7 +290,7 @@ const ProductInfo = (data) => {
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Daño reportado:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>{data.data.falla_reportada}</Text>
         </View>
       </View>
       <View style={styles.row} >

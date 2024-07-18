@@ -1,4 +1,5 @@
 "use client";
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
@@ -11,12 +12,70 @@ import { Button } from "@material-tailwind/react";
 import { Breadcrumbs } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
 import {
+  MagnifyingGlassIcon,
+  ChevronUpDownIcon,
+} from "@heroicons/react/24/outline";
+import {
+  PencilIcon,
+  UserPlusIcon,
+  DocumentIcon,
+} from "@heroicons/react/24/solid";
+import {
   Accordion,
   AccordionHeader,
   AccordionBody,
 } from "@material-tailwind/react";
+import {
+  Card,
+  CardHeader,
+  
+  Typography,
+  
+  CardBody,
+  Chip,
+  CardFooter,
+  Tabs,
+  TabsHeader,
+  Tab,
+  Avatar,
+  IconButton,
+  Tooltip,
+} from "@material-tailwind/react";
 
 const MySwal = withReactContent(Swal);
+
+const fetchOrdersData = async (idEquipo) => {
+  const requestOptions = {
+    method: "GET",
+    redirect: "follow",
+    credentials: "include",
+  };
+
+  try{
+     const response = await fetch(
+    `${API_BASE_URL}/orders/equipo/${idEquipo}`,
+    requestOptions
+  );
+  // Verificar el estado de la respuesta
+  if (!response.ok) {
+    // Obtener el mensaje de error del cuerpo de la respuesta
+    const errorData = await response.json();
+    throw errorData;
+  }
+
+  // Convertir la respuesta a JSON
+  const result = await response.json();
+  return result;
+  }
+  catch (error) {
+    // Manejar errores de red o de la API
+    // console.error('Error actualizando los datos del cliente:', error);
+    throw error;
+  }
+
+};
+
+
 
 const fetchClientData = async (idEquipo) => {
   const requestOptions = {
@@ -25,7 +84,7 @@ const fetchClientData = async (idEquipo) => {
   };
 
   const response = await fetch(
-    `http://127.0.0.1:3001/equipos/${idEquipo}`,
+    `${API_BASE_URL}/equipos/${idEquipo}`,
     requestOptions
   );
   const result = await response.json();
@@ -44,7 +103,7 @@ const updateClientData = async (idEquipo, data) => {
   };
 
   const response = await fetch(
-    `http://127.0.0.1:3001/equipos/${idEquipo}`,
+    `${API_BASE_URL}/equipos/${idEquipo}`,
     requestOptions
   );
   const result = await response.json();
@@ -62,7 +121,7 @@ const insertClientData = async (data) => {
   };
 
   const response = await fetch(
-    `http://127.0.0.1:3001/clients/`,
+    `${API_BASE_URL}/clients/`,
     requestOptions
   );
   const result = await response.json();
@@ -79,26 +138,44 @@ export default function ClientForm({ params }) {
   } = useForm();
   const [client, setClient] = useState(null);
   const [marca, setMarca] = useState(null);
+  const [dataOrders, setDataOrders] = useState([]);
   const idEquipo = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
   const router = useRouter();
 
- 
+  const TABLE_HEAD = [
+    "Consecutivo",
+    "Etapa",
+    "Tipo",
+    "Cliente",
+    "Fecha Creacion",
+    "Creado por",
+    "",
+  ];
+  
+const ROWS_PER_PAGE = 10;
+
   useEffect(() => {
     const loadClientData = async () => {
       const clientData = await fetchClientData(idEquipo);
+       // Resetear el formulario con los datos del cliente
+       reset(clientData);
+      
       setClient(clientData);
       setMarca(clientData.marca)
+
+      const orders = await fetchOrdersData(idEquipo)
+      setDataOrders(orders)
       
-      // Resetear el formulario con los datos del cliente
-      reset(clientData);
+      
+     
     };
 
     loadClientData();
-  }, [idEquipo, reset]);
+  }, [idEquipo,reset]);
   
 
   const onSubmit = async (data) => {
-    console.log(data);
+
     try {
       if (idEquipo == "create") {
         const insert = await insertClientData(data);
@@ -254,9 +331,120 @@ export default function ClientForm({ params }) {
               Ordenes de Servicio
             </AccordionHeader>
             <AccordionBody>
-              <Link href={"../orders/create"} color="yellow" className="m-2">
-                Nuevo
+              <Link href={"../orders/create"} color="yellow" className="m-2 float-end p-2 bg-black rounded-lg text-white font-bold">
+                Nueva Orden de Servicio
               </Link>
+              <table className="mt-4 w-full min-w-max table-auto text-left dark:border-gray-700">
+          <thead>
+            <tr>
+              {TABLE_HEAD.map((head, index) => (
+                <th
+                  key={head}
+                  onClick={() => handleSort(head)}
+                  className="cursor-pointer border-y border-blue-gray-100  p-4 transition-colors hover:bg-blue-gray-50"
+                >
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="flex items-center justify-between gap-2 font-normal leading-none opacity-70 dark:text-white"
+                  >
+                    {head}{" "}
+                    {index !== TABLE_HEAD.length - 1 && (
+                      <ChevronUpDownIcon strokeWidth={2} className="h-4 w-4" />
+                    )}
+                  </Typography>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {dataOrders.map(({ id, etapa, tipo, razonSocial,usuario_creado,fecha_creacion }, index) => {
+              const isLast = index === dataOrders.length - 1;
+              const classes = isLast
+                ? "p-4"
+                : "p-4 border-b border-blue-gray-50";
+
+              return (
+                <tr key={id}>
+                  <td className={classes}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <Tooltip content="Editar Orden">
+                          <Link
+                            href={"../orders/" + id}
+                            variant="small"
+                            className="font-normal opacity-70 text-yellow-800 border-b-2 dark:text-white"
+                          >
+                            OS-{id}
+                          </Link>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </td>
+                  <td className={classes}>
+                    <div className="flex flex-col">
+                      <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-normal dark:text-white"
+                      >
+                        {etapa}
+                      </Typography>
+                      <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-normal opacity-70 dark:text-white"
+                      ></Typography>
+                    </div>
+                  </td>
+                  <td className={classes}>
+                    <div className="w-max">
+                      <Typography
+                        variant="small"
+                        color="blue-gray"
+                        className="font-normal dark:text-white"
+                      >
+                        {tipo}
+                      </Typography>
+                    </div>
+                  </td>
+                  <td className={classes}>
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal dark:text-white"
+                    >
+                      {razonSocial}
+                    </Typography>
+                  </td>
+                  <td>
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal dark:text-white"
+                    >{fecha_creacion}</Typography>
+                  </td>
+                  <td>
+                  <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal dark:text-white"
+                    >{usuario_creado}</Typography>
+                  </td>
+                  <td className={classes}>
+                    <Tooltip content="Generar impresion">
+                      <Link href={"../orders/" + id + "/document"}>
+                        <IconButton variant="text">
+                          <DocumentIcon className="h-4 w-4 dark:text-white" />
+                        </IconButton>
+                      </Link>
+                    </Tooltip>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
             </AccordionBody>
           </Accordion>
           {/* <Accordion open={open === 2}>

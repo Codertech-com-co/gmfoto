@@ -1,13 +1,14 @@
 "use client";
-import Swal from 'sweetalert2';
-import withReactContent from 'sweetalert2-react-content';
+const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
 import { Button } from "@material-tailwind/react";
 import { Breadcrumbs } from "@material-tailwind/react";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const MySwal = withReactContent(Swal);
 
@@ -17,7 +18,10 @@ const fetchClientData = async (clientId) => {
     redirect: "follow",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${clientId}`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/clients/${clientId}`,
+    requestOptions
+  );
   const result = await response.json();
   return result[0];
 };
@@ -30,13 +34,29 @@ const updateClientData = async (clientId, data) => {
     },
     body: JSON.stringify(data),
     redirect: "follow",
+    credentials: "include",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/${clientId}`, requestOptions);
-  const result = await response.json();
-  return result;
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/clients/${clientId}`,
+      requestOptions
+    );
+    // Verificar el estado de la respuesta
+    if (!response.ok) {
+      // Obtener el mensaje de error del cuerpo de la respuesta
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    // Convertir la respuesta a JSON
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
-const insertClientData = async ( data) => {
+const insertClientData = async (data) => {
   const requestOptions = {
     method: "POST",
     headers: {
@@ -44,15 +64,37 @@ const insertClientData = async ( data) => {
     },
     body: JSON.stringify(data),
     redirect: "follow",
+    credentials: "include",
   };
 
-  const response = await fetch(`http://127.0.0.1:3001/clients/`, requestOptions);
-  const result = await response.json();
-  return result;
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/clients/`,
+      requestOptions
+    );
+    // Verificar el estado de la respuesta
+    if (!response.ok) {
+      // Obtener el mensaje de error del cuerpo de la respuesta
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    // Convertir la respuesta a JSON
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export default function ClientForm({ params }) {
-  const { register, handleSubmit, setValue, reset, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
   const [client, setClient] = useState(null);
   const clientId = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
   const router = useRouter();
@@ -72,38 +114,38 @@ export default function ClientForm({ params }) {
   const onSubmit = async (data) => {
     // console.log(data);
     try {
-      if (clientId =='create'){
-        const insert = await insertClientData( data);
-      }else{
+      if (clientId == "create") {
+        const insert = await insertClientData(data);
+        console.log(insert);
+      } else {
         const updatedClient = await updateClientData(clientId, data);
       }
-      
+
       MySwal.fire({
-        title:"Datos Guardados",
-        icon:"success",
-        toast:true,
-        position:"bottom",
-        showConfirmButton:false,
-        timer:3000,
-        timerProgressBar:false,
-        
-      })
-      setTimeout(()=>{
-        router.push('/clients');
-      },500)
-      
+        title: "Datos Guardados",
+        icon: "success",
+        toast: true,
+        position: "bottom",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: false,
+      });
+      setTimeout(() => {
+        router.push("/clients");
+      }, 500);
+
       // console.log("Cliente actualizado:", updatedClient);
     } catch (error) {
+      console.log(error)
       MySwal.fire({
-        title:"Error actualizando cliente",
-        icon:"error",
-        toast:true,
-        position:"bottom",
-        showConfirmButton:false,
-        timer:5000,
-        timerProgressBar:false,
-        
-      })
+        title: "Error guardando datos",
+        icon: "error",
+        toast: true,
+        position: "bottom",
+        showConfirmButton: false,
+        timer: 5000,
+        timerProgressBar: false,
+      });
       // console.error("Error actualizando cliente:", error);
     }
   };
@@ -126,7 +168,7 @@ export default function ClientForm({ params }) {
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2 bg-white"
       >
-        <b className='text-black col-span-2'>Datos Empresa</b>
+        <b className="text-black col-span-2">Datos Empresa</b>
         <Input
           label="Identificación"
           name="documento"
@@ -147,12 +189,7 @@ export default function ClientForm({ params }) {
           register={register}
           errors={errors}
         />
-        <Input
-          label="WhatsApp"
-          name="whatsApp"
-          register={register}
-          errors={errors}
-        />
+       
         <Input
           label="Teléfono"
           name="telefonoEstablecimiento"
@@ -166,8 +203,8 @@ export default function ClientForm({ params }) {
           rules={{
             pattern: {
               value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
-              message: "Email no válido"
-            }
+              message: "Email no válido",
+            },
           }}
           errors={errors}
         />
@@ -207,19 +244,27 @@ export default function ClientForm({ params }) {
           register={register}
           errors={errors}
         />
-        <b className='text-black col-span-2'>Datos de Contacto</b>
+        <b className="text-black col-span-2">Datos de Contacto</b>
         <Input
           label="Nombre persona de Contacto"
           name="nombrePersonaContacto"
           register={register}
           errors={errors}
         />
-        
+         <Input
+          label="Celular Contacto"
+          name="celularPersonaContacto"
+          register={register}
+          errors={errors}
+        />
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Link href="../clients" className="m-2 text-black">Cancelar</Link>
-          <Button type="submit" color="yellow" className="m-2">Guardar</Button>
-          
+          <Link href="../clients" className="m-2 text-black">
+            Cancelar
+          </Link>
+          <Button type="submit" color="yellow" className="m-2">
+            Guardar
+          </Button>
         </div>
       </form>
     </div>

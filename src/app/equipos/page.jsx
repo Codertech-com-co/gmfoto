@@ -81,15 +81,15 @@ export function SortableTable() {
             setTableRows(dataTable);
             setLoading(false);
 
-            MySwal.fire({
-                title: "Lista actualizada",
-                icon: "success",
-                toast: true,
-                position: "bottom",
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: false,
-            })
+            // MySwal.fire({
+            //     title: "Lista actualizada",
+            //     icon: "success",
+            //     toast: true,
+            //     position: "bottom",
+            //     showConfirmButton: false,
+            //     timer: 3000,
+            //     timerProgressBar: false,
+            // })
         } catch (error) {
             console.error('Error fetching data:', error);
             setLoading(false);
@@ -217,7 +217,7 @@ export function SortableTable() {
                 </div>
 
                 <br />
-                <Button variant='outlined' className='border-yellow-500 text-black' size='sm'>Exportar Datos</Button>
+                {/* <Button variant='outlined' className='border-yellow-500 text-black' size='sm'>Exportar Datos</Button> */}
             </CardHeader>
             <CardBody className="overflow-auto px-0">
                 <table className="mt-4 w-full min-w-max table-auto text-left dark:text-white" >
@@ -341,6 +341,8 @@ export function SortableTable() {
             <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                 <Typography variant="small" color="blue-gray" className="font-normal">
                     Pagina {currentPage} de {totalPages}
+                    <br />
+                    Total registros {TABLE_ROWS.length}
                 </Typography>
                 <div className="flex gap-2">
                     <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>
