@@ -1,14 +1,15 @@
 "use client";
-const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm,useFieldArray  } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
-import Select from "../../../components/ui/Select2";
+import Select2 from "../../../components/ui/Select2";
+import Select from "../../../components/ui/Select";
 import Textarea from "../../../components/ui/Textarea";
-import { Button, Breadcrumbs, Typography } from "@material-tailwind/react";
+import { Button, Breadcrumbs, Typography ,TextField ,MenuItem } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
 import { fetchClients } from "../../../utils/api/clients";
 import { fetchEquipos } from "../../../utils/api/equipos";
@@ -20,6 +21,7 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
+import { v4 as uuidv4 } from 'uuid'; // Asegúrate de instalar la librería uuid
 
 const MySwal = withReactContent(Swal);
 
@@ -27,6 +29,7 @@ const fetchClientData = async (idEquipo) => {
   const requestOptions = {
     method: "GET",
     redirect: "follow",
+    credentials: "include",
   };
 
   const response = await fetch(
@@ -82,21 +85,20 @@ const insertClientData = async (data) => {
     credentials: "include",
   };
   try {
-  const response = await fetch(`${API_BASE_URL}/orders/`, requestOptions);
-   // Verificar el estado de la respuesta
-   if (!response.ok) {
-    // Obtener el mensaje de error del cuerpo de la respuesta
-    const errorData = await response.json();
-    throw errorData;
+    const response = await fetch(`${API_BASE_URL}/orders/`, requestOptions);
+    // Verificar el estado de la respuesta
+    if (!response.ok) {
+      // Obtener el mensaje de error del cuerpo de la respuesta
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    // Convertir la respuesta a JSON
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error;
   }
-
-  // Convertir la respuesta a JSON
-  const result = await response.json();
-  return result;
-} catch (error) {
-  throw error;
-}
-
 };
 
 const ClientForm = ({ params }) => {
@@ -119,23 +121,19 @@ const ClientForm = ({ params }) => {
   const [personaRecibe, setPersonaRecibe] = useState("");
   const [trasportadora, setTrasportadora] = useState("");
   // const [estadoProducto, setEstadoProducto] = useState(`"['POR_VALIDAR']"`);
-  const [estadoProducto, setEstadoProducto] = useState(['POR_VALIDAR']);
+  const [estadoProducto, setEstadoProducto] = useState(["POR_VALIDAR"]);
   const [requiereImportacion, setRequiereImportacion] = useState("");
   const [idCliente, setIdCliente] = useState(null);
   const [equipo, setEquipo] = useState(null);
 
   useEffect(() => {
     const loadClientData = async () => {
-      
-        var listClients = await fetchClients();
-        listClients = listClients.map((data) => ({
-          label: data.razonSocial,
-          value: data.id,
-        }));
-        setClients(listClients);
-      
-
-      
+      var listClients = await fetchClients();
+      listClients = listClients.map((data) => ({
+        label: data.razonSocial,
+        value: data.id,
+      }));
+      setClients(listClients);
 
       var listEquipos = await fetchEquipos();
       listEquipos = listEquipos.map((data) => ({
@@ -144,31 +142,32 @@ const ClientForm = ({ params }) => {
       }));
       setEquipos(listEquipos);
       if (idEquipo !== "create") {
+        const orderData = await fetchClientData(idEquipo);
+        let dataOrder = {
+          ...orderData,
+          fecha_cierre: orderData.fecha_cierre
+            ? orderData.fecha_cierre.split(".")[0]
+            : "",
+          fecha_proxima: datetimeToDate(orderData.fecha_proxima),
+        };
 
-      const orderData = await fetchClientData(idEquipo);
-      let dataOrder = {
-        ...orderData,
-        fecha_cierre: orderData.fecha_cierre ? orderData.fecha_cierre.split(".")[0] : "",
-        fecha_proxima: datetimeToDate(orderData.fecha_proxima)
-      };
+        setOrder(orderData);
+        setArea(orderData.area);
+        setTipo(orderData.tipo);
+        setEtapa(orderData.etapa);
+        setProcesoLogistico(orderData.proceso_logistico);
+        setPersonaRecibe(orderData.persona_que_recibe);
+        setTrasportadora(orderData.transportadora);
+        setEstadoProducto(JSON.parse(orderData.estado_del_producto));
+        setRequiereImportacion(orderData.requiere_importacion);
+        setIdCliente(orderData.cliente);
+        setEquipo(orderData.equipo);
 
-      setOrder(orderData);
-      setArea(orderData.area);
-      setTipo(orderData.tipo);
-      setEtapa(orderData.etapa);
-      setProcesoLogistico(orderData.proceso_logistico);
-      setPersonaRecibe(orderData.persona_que_recibe);
-      setTrasportadora(orderData.transportadora);
-      setEstadoProducto(JSON.parse(orderData.estado_del_producto));
-      setRequiereImportacion(orderData.requiere_importacion);
-      setIdCliente(orderData.cliente);
-      setEquipo(orderData.equipo);
-
-      // Resetear el formulario con los datos del cliente si orderData tiene datos
-      if (orderData) {
-        reset(dataOrder);
+        // Resetear el formulario con los datos del cliente si orderData tiene datos
+        if (orderData) {
+          reset(dataOrder);
+        }
       }
-    }
     };
 
     loadClientData();
@@ -233,7 +232,7 @@ const ClientForm = ({ params }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
-        <Select
+        <Select2
           label="Area"
           name="area"
           value={area}
@@ -244,11 +243,11 @@ const ClientForm = ({ params }) => {
             {
               label: "Servicio Técnico",
               value: "servicio_tecnico",
-              selected: true,
+              Select2ed: true,
             },
           ]}
         />
-        <Select
+        <Select2
           label="Tipo"
           name="tipo"
           value={tipo}
@@ -260,7 +259,7 @@ const ClientForm = ({ params }) => {
             { label: "Fuera de Garantía", value: "fuera_de_garantia" },
           ]}
         />
-        <Select
+        <Select2
           label="Etapa"
           name="etapa"
           value={etapa}
@@ -283,7 +282,7 @@ const ClientForm = ({ params }) => {
           Datos Cliente
         </Typography>
         <br />
-        <Select
+        <Select2
           label="Cliente"
           name="cliente"
           value={idCliente}
@@ -299,7 +298,7 @@ const ClientForm = ({ params }) => {
           Datos del producto
         </Typography>
         <br />
-        <Select
+        <Select2
           label="Equipo"
           name="equipo"
           value={equipo}
@@ -324,7 +323,7 @@ const ClientForm = ({ params }) => {
           register={register}
           rules={{ required: false }}
         />
-        <Select
+        <Select2
           label="Proceso Logístico"
           name="proceso_logistico"
           register={register}
@@ -354,7 +353,7 @@ const ClientForm = ({ params }) => {
             },
           ]}
         />
-        <Select
+        <Select2
           label="Persona que recibe el Producto"
           name="persona_que_recibe"
           value={personaRecibe}
@@ -363,7 +362,7 @@ const ClientForm = ({ params }) => {
           setValue={setValue}
           options={[{ label: "Duvan Camilo Ayala", value: "123456789" }]}
         />
-        <Select
+        <Select2
           label="Transportadora"
           name="transportadora"
           register={register}
@@ -385,7 +384,7 @@ const ClientForm = ({ params }) => {
           register={register}
           rules={{ required: false }}
         />
-        <Select
+        <Select2
           label="Estado del Producto"
           name="estado_del_producto"
           value={estadoProducto}
@@ -416,7 +415,7 @@ const ClientForm = ({ params }) => {
           register={register}
         />
 
-        <Select
+        <Select2
           label="Requiere Importación"
           name="requiere_importacion"
           register={register}
@@ -461,44 +460,180 @@ const ClientForm = ({ params }) => {
   );
 };
 
-function Bitacora({ params }) {
+const getUsuarios = async () => {
+  const requestOptions = {
+    method: "GET",
+    redirect: "follow",
+    credentials: "include",
+  };
+  try {
+    const response = await fetch(API_BASE_URL + "/users/all", requestOptions);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error fetching users:", error);
+    return [];
+  }
+};
+
+const getLabores = async (order) => {
+  const requestOptions = {
+    method: "GET",
+    redirect: "follow",
+    credentials: "include",
+  };
+  try {
+    const response = await fetch(API_BASE_URL + "/labores/"+order, requestOptions);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Error fetching labores:", error);
+    return [];
+  }
+};
+
+function Bitacora({params}) {
+  const order_id = params.id
+  const [usuarios, setUsuarios] = useState([]);
+  const [labores, setLabores] = useState([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      let listUser = await getUsuarios();
+      listUser = Array.isArray(listUser) ? listUser.map((item) => ({
+        label: `${item.names} ${item.lastnames}`,
+        value: item.id,
+      })) : [];
+      setUsuarios(listUser);
+
+      let listLabores = await getLabores(order_id);
+      listLabores = Array.isArray(listLabores) ? listLabores : [];
+      setLabores(listLabores);
+    };
+    loadData();
+  }, []);
+
+  const handleLaborChange = (index, field, value) => {
+    const updatedLabores = labores.map((labor, i) =>
+      i === index ? { ...labor, [field]: value } : labor
+    );
+    setLabores(updatedLabores);
+  };
+
+  const addLabor = () => {
+    setLabores([...labores, { id: uuidv4(), tecnico: "", labor: "" }]);
+  };
+
+  const removeLabor = (index) => {
+    const updatedLabores = labores.filter((_, i) => i !== index);
+    setLabores(updatedLabores);
+  };
+
+  const saveLabores = () => {
+    console.log("Labores guardadas:", labores);
+    labores.map(async(item) =>{
+      item = {
+        ...item,
+        order_id
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labores`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(item),
+          credentials: "include",
+        });
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        return await response.json();
+      } catch (error) {
+        console.error('Error posting transaction:', error);
+        throw error;
+      }
+
+    })
+  };
+
   return (
     <div className="h-[80vh] mt-5">
       <Typography variant="h4">Bitácora</Typography>
       <br />
-      <Button color="white" className="float-right">
+      <Button color="white" className="float-right" onClick={addLabor}>
         Agregar labor
       </Button>
       <br />
+      <br />
+      <br />
 
-      <table className="w-full   text-center">
+      <table className="w-full text-center">
         <thead>
           <tr>
-            <th></th>
+            <th>#</th>
             <th>Técnico</th>
             <th>Labor realizada</th>
-            <th></th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1.</td>
-            <td className="p-3">
-              <Select label={""} options={[]} />
-            </td>
-            <td className="p-3">
-              <Textarea label={""} />
-            </td>
-            <td>
-              <Button color="red">Eliminar</Button>
-            </td>
-          </tr>
+          {labores.map((labor, index) => (
+            <tr key={labor.id}>
+              <td>{index + 1}.</td>
+              <td className="p-3">
+                <select
+                  value={labor.tecnico}
+                  onChange={(e) =>
+                    handleLaborChange(index, "tecnico", e.target.value)
+                  }
+                  className="w-full h-10 bg-transparent text-blue-gray-700 font-sans font-normal outline-none focus:outline-none border border-blue-gray-200 rounded-[7px] px-2"
+                >
+                  <option value="" disabled hidden>
+                    Seleccione técnico
+                  </option>
+                  {usuarios.map((usuario) => (
+                    <option key={usuario.value} value={usuario.value}>
+                      {usuario.label}
+                    </option>
+                  ))}
+                </select>
+              </td>
+              <td className="p-3">
+                <Textarea
+                  label=""
+                  value={labor.labor}
+                  onChange={(e) =>
+                    handleLaborChange(index, "labor", e.target.value)
+                  }
+                />
+              </td>
+              <td>
+                <Button color="red" onClick={() => removeLabor(index)}>
+                  Eliminar
+                </Button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
+      <Button color="primary" onClick={saveLabores}>
+        Guardar Labores
+      </Button>
     </div>
   );
 }
-
 export default function TabsCustomAnimation({ params }) {
   const data = [
     {
@@ -510,6 +645,11 @@ export default function TabsCustomAnimation({ params }) {
       label: "Bitácora de labores realizadas",
       value: "bitacora",
       desc: <Bitacora params={params} />,
+    },
+    {
+      label: "Repuestos",
+      value: "repuestos",
+      desc: <RepuestosTab params={params} />,
     },
   ];
 
@@ -549,3 +689,237 @@ export default function TabsCustomAnimation({ params }) {
     </>
   );
 }
+
+
+
+
+
+
+
+const fetchProducts = async () => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/productos/all`,{
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched products:', data);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid data format: Expected an array');
+    }
+
+    return data.map(product => ({
+      label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
+      value: product.id,
+      cantidadDisponible: product.cantidad_disponible
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+};
+const fetchProductsOrder = async (order) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones/numero_referencia/${order}`,{
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched products:', data);
+
+    if (!Array.isArray(data)) {
+      throw new Error('Invalid data format: Expected an array');
+    }
+
+    return data.map(product => ({
+      label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
+      value: product.id,
+      cantidadDisponible: product.cantidad_disponible
+    }));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return [];
+  }
+};
+
+const postTransaction = async (transaction) => {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(transaction),
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error posting transaction:', error);
+    throw error;
+  }
+};
+
+const RepuestosTab = ({ params, userName }) => {
+  const orderId = params.id
+  const [productos, setProductos] = useState([]);
+  const [repuestos, setRepuestos] = useState([]);
+  const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm();
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        const productList = await fetchProducts();
+        setProductos(productList);
+        const repuestosList = await fetchProductsOrder(orderId)
+        setRepuestos(repuestosList)
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
+
+    loadProducts();
+  }, []);
+
+  const handleAddRepuesto = async (data) => {
+    console.log(data)
+    const producto = productos.find(p => p.value === data.producto);
+    if (!producto) {
+      MySwal.fire({
+        title: "Error",
+        text: "Producto no encontrado.",
+        icon: "error"
+      });
+      return;
+    }
+
+    if (parseInt(data.cantidad) > producto.cantidadDisponible) {
+      MySwal.fire({
+        title: "Error",
+        text: "Cantidad excede el stock disponible.",
+        icon: "error"
+      });
+      return;
+    }
+
+    const nuevoRepuesto = {
+      id: uuidv4(),
+      id_producto: data.producto,
+      cantidad: data.cantidad,
+      orden_id: orderId
+    };
+
+    try {
+      // Enviar la transacción
+      const transaction = {
+        tipo: "salida", // Puedes cambiar esto según sea necesario
+        id_producto: data.producto,
+        id_proveedor: 1, // Puedes cambiar esto si tienes el id del proveedor
+        cantidad: data.cantidad,
+        cantidad_stock: data.cantidad,
+        numero_referencia: orderId
+      };
+      
+      await postTransaction(transaction);
+      setRepuestos([...repuestos, nuevoRepuesto]);
+      setValue('producto', '');
+      setValue('cantidad', '');
+      MySwal.fire({
+        title: "Éxito",
+        text: "Repuesto agregado exitosamente.",
+        icon: "success"
+      });
+    } catch (error) {
+      MySwal.fire({
+        title: "Error",
+        text: `No se pudo agregar el repuesto: ${error.message}`,
+        icon: "error"
+      });
+    }
+  };
+
+  const handleRemoveRepuesto = (id) => {
+    setRepuestos(repuestos.filter(r => r.id !== id));
+  };
+
+  return (
+    <div>
+      <Typography variant="h4" className="mb-4">Repuestos</Typography>
+
+      <form onSubmit={handleSubmit(handleAddRepuesto)} className="space-y-4 mb-4">
+        <div className="w-full">
+          <label htmlFor="producto" className="block text-gray-700">Producto</label>
+          <Select
+            id="producto"
+            name={'producto'}
+            register={register}
+            rules={{ required: true }}
+            isClearable
+            options={productos}
+            className="w-full"
+          />
+          {errors.producto && <p className="text-red-500">{errors.producto.message}</p>}
+        </div>
+
+        <div className="w-full">
+          <label htmlFor="cantidad" className="block text-gray-700">Cantidad</label>
+          <Input
+            id="cantidad"
+            type="number"
+            min="1"
+            name={'cantidad'}
+            register={register}
+            rules={{ required: true }}
+            
+            placeholder="Cantidad"
+            className="w-full"
+          />
+          {errors.cantidad && <p className="text-red-500">{errors.cantidad.message}</p>}
+        </div>
+
+        <Button type="submit" color="yellow" variant="contained">
+          Agregar
+        </Button>
+      </form>
+
+      <Typography variant="h5" className="mb-2">Repuestos Agregados</Typography>
+      <table className="w-full text-center border-collapse border border-gray-200">
+        <thead>
+          <tr>
+            <th className="border border-gray-300 p-2">Producto</th>
+            <th className="border border-gray-300 p-2">Cantidad</th>
+            <th className="border border-gray-300 p-2">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {repuestos.map(repuesto => (
+            <tr key={repuesto.id}>
+              <td className="border border-gray-300 p-2">
+                {productos.find(p => p.value === repuesto.id_producto)?.label}
+              </td>
+              <td className="border border-gray-300 p-2">{repuesto.cantidad}</td>
+              <td className="border border-gray-300 p-2">
+                <Button color="red" onClick={() => handleRemoveRepuesto(repuesto.id)}>
+                  Eliminar
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

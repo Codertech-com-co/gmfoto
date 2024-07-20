@@ -147,17 +147,17 @@ function MyDocument(props) {
       <PDFViewer width="100%" height="600">
         <Document title={id} author='CoderTech'>
           <Page size="Legal" style={styles.page}>
-            <Header />
+            <Header  data={data}/>
             <CustomerInfo data={data}/>
             <ProductInfo data={data}/>
             <ServiceInfo data={data}/>
-            <Authorization />
+            <Authorization data={data}/>
             <Text style={{ textAlign: "center", fontSize:8 }}>SOLO PRESTAMOS SERVICIO DE GARANTIAS PARA MN FOTO SAS Y/O SH AMERICAS</Text>
           </Page>
         </Document>
       </PDFViewer>
       <div className='mt-5'>
-        <Button color='yellow'>Enviar a Email</Button>
+        {/* <Button color='yellow'>Enviar a Email</Button> */}
       </div>
     </>
 
@@ -166,7 +166,7 @@ function MyDocument(props) {
 };
 
 
-const Header = () => {
+const Header = (data) => {
   return (
     <>
       <View style={styles.header}>
@@ -202,30 +202,30 @@ const Header = () => {
 
 
 const CustomerInfo = (data) => {
- 
+ data = data.data
   return (
     <View style={styles.section}>
       <Text style={styles.label}>DATOS DEL CLIENTE</Text>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Nombre:</Text>
-          <Text style={styles.input}>GERMAN GONZALEZ</Text>
+          <Text style={styles.input}>{data.razonSocial}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Documento de Identidad N°:</Text>
-          <Text style={styles.input}>316 7432951</Text>
+          <Text style={styles.input}>{data.documento}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Dirección:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>{data.direccion}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Ciudad:</Text>
-          <Text style={styles.input}>Bogota</Text>
+          <Text style={styles.input}>{data.ciudad}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Teléfono fijo:</Text>
@@ -233,27 +233,27 @@ const CustomerInfo = (data) => {
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Celular:</Text>
-          <Text style={styles.input}>3124567896</Text>
+          <Text style={styles.input}>{data.telefonoEstablecimiento}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Correo electronico:</Text>
-          <Text style={styles.input}>duvanmunoz38@gmail.com</Text>
+          <Text style={styles.input}>{data.telefonoEstablecimiento}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Guia de Envio:</Text>
-          <Text style={styles.input}>{data.data.guia}</Text>
+          <Text style={styles.input}>{data.guia}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Transportadora:</Text>
-          <Text style={styles.input}>ENVIA</Text>
+          <Text style={styles.input}>{data.transportadora}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Fecha de Envio:</Text>
-          <Text style={styles.input}>2024-06-27</Text>
+          <Text style={styles.input}>{data.fecha_cierre|| ''}</Text>
         </View>
       </View>
 
@@ -262,7 +262,7 @@ const CustomerInfo = (data) => {
 };
 
 const ProductInfo = (data) => {
-  
+  data = data.data
   
   return (
     <View style={styles.section}>
@@ -270,83 +270,84 @@ const ProductInfo = (data) => {
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Marca:</Text>
-          <Text style={styles.input}>456489743135</Text>
+          <Text style={styles.input}>{data.marca}</Text>
         </View>
-        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Modelo:</Text>
           <Text style={styles.input}>ENVIA</Text>
-        </View>
+        </View> */}
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Serial:</Text>
-          <Text style={styles.input}>2024-06-27</Text>
+          <Text style={styles.input}>{data.serial}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Accesorios:</Text>
-          <Text style={styles.textArea}>{data.data.accesorios}</Text>
+          <Text style={styles.textArea}>{data.accesorios}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Daño reportado:</Text>
-          <Text style={styles.input}>{data.data.falla_reportada}</Text>
+          <Text style={styles.input}>{data.falla_reportada}</Text>
         </View>
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Almacen donde compro el producto:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>.</Text>
         </View>
       </View>
       <View style={styles.row} >
 
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Fecha de compa:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>.</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Equipo con garantia:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>{data.tipo}</Text>
         </View>
       </View>
       <View style={styles.row} >
 
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Numero de la factura:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>.</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Persona que recibe el producto:</Text>
-          <Text style={styles.input}>Direccion de prueba</Text>
+          <Text style={styles.input}>{data.persona_que_recibe_nombre}</Text>
         </View>
       </View>
     </View>
   );
 };
 
-const ServiceInfo = () => {
+const ServiceInfo = (data) => {
+  data = data.data
   return (
     <View style={styles.section}>
       <Text style={styles.label}>INFORMACIÓN SERVICIO TÉCNICO</Text>
       <View style={styles.row}>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Diagnostico:</Text>
-          <Text style={styles.textArea}>duvanmunoz38@gmail.com</Text>
+          <Text style={styles.textArea}>{data.diagnostico}</Text>
         </View>
       </View>
       <Text style={{ fontWeight: 600, textAlign: 'center', marginTop: 10, fontSize: 8, marginBottom: 8 }}>TODOS LOS EQUIPOS ESTAN SUJETOS A UN NUEVO DIAGNOSTICO Y CAMBIO EN EL COSTO DE LA REPARACION, ESTE PUEDE AUMENTAR DESPUES DEL CAMBIO DE LAS PARTES SOLICITADAS, SOLO EN ESTE MOMENTO PUEDEN DETERMINAR FALLAS OCULTAS EN EL EQUIPO.</Text>
-      <View style={styles.row}>
+      {/* <View style={styles.row}>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Trabajo realizado:</Text>
           <Text style={styles.textArea}>duvanmunoz38@gmail.com</Text>
         </View>
-      </View>
+      </View> */}
 
       <View style={styles.row}>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Notas y/o recomendaciones:</Text>
-          <Text style={styles.textArea}>duvanmunoz38@gmail.com</Text>
+          <Text style={styles.textArea}>{data.observaciones}</Text>
         </View>
       </View>
       <View>
@@ -367,7 +368,7 @@ DIAGNOSTICO, COTIZACIÓN EL CLIENTE NO HA DADO RESPUESTA DE APROBACIÓN O DESAPR
   );
 };
 
-const Authorization = () => {
+const Authorization = (data) => {
   return (
     <View style={styles.row} >
 

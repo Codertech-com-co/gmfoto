@@ -61,12 +61,12 @@ const navListMenuItems = [
     icon: RectangleGroupIcon,
     href:"/equipos"
   },
-  // {
-  //   title: "Inventario",
-  //   description: "Cree, Modifique y Busque",
-  //   icon: SquaresPlusIcon,
-  //   href:"/inventory"
-  // },
+  {
+    title: "Inventario",
+    description: "Cree, Modifique y Busque",
+    icon: SquaresPlusIcon,
+    href:"/inventory"
+  },
   {
     title: "Comunicación",
     description: "Crea recordatorios y notifica a tus clientes",
@@ -209,7 +209,8 @@ function NavList() {
        
       </MenuHandler>
       <MenuList>
-        <MenuItem>Perfil</MenuItem>
+        {/* <MenuItem>Perfil</MenuItem> */}
+        <MenuItem onClick={()=>{router.push('./settings')}}>Configuración</MenuItem>
         <MenuItem className="text-red-600" onClick={()=>{cerrarSesion()}}>Cerrar sesion</MenuItem>
       </MenuList>
     </Menu>
