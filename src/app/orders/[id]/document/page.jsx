@@ -48,8 +48,8 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   logo: {
-    width: 100,
-    height: 50,
+    width: 50,
+    height: 'auto',
   },
   headerText: {
     fontSize: 10,

@@ -92,7 +92,7 @@ export default function CategoryList() {
         <Typography variant="h3" color="blue-gray">
           Categorías
         </Typography>
-        <Link href="./categories/create" className="bg-yellow-500 text-black p-2 rounded-md">
+        <Link href="./categories/create" className="bg-white shadow text-black p-2 rounded-md">
           Crear Categoría
         </Link>
       </div>
@@ -100,6 +100,7 @@ export default function CategoryList() {
         <table className="mt-4 w-full min-w-max table-auto text-left">
           <thead>
             <tr>
+              <th className="p-4">Id</th>
               <th className="p-4">Nombre</th>
               <th className="p-4">Descripción</th>
               <th className="p-4">Acciones</th>
@@ -108,13 +109,14 @@ export default function CategoryList() {
           <tbody>
             {categories.map(({ id, nombre, descripcion }) => (
               <tr key={id}>
+                <td className="p-4 border-b border-blue-gray-50">{id}</td>
                 <td className="p-4 border-b border-blue-gray-50">{nombre}</td>
                 <td className="p-4 border-b border-blue-gray-50">{descripcion}</td>
                 <td className="p-4 border-b border-blue-gray-50">
                   <div className="flex space-x-2">
                     <Tooltip content="Editar">
                       <Link href={`./categories/${id}`}>
-                        <IconButton size="sm" className="bg-yellow-500 text-black">
+                        <IconButton size="sm" className="text-gray-800 bg-white">
                           <PencilIcon className="h-4 w-4" />
                         </IconButton>
                       </Link>
@@ -122,7 +124,7 @@ export default function CategoryList() {
                     <Tooltip content="Eliminar">
                       <IconButton
                         size="sm"
-                        className="bg-red-500 text-black"
+                        className="bg-white text-red-500"
                         onClick={() => handleDelete(id)}
                       >
                         <TrashIcon className="h-4 w-4" />
