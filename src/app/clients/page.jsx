@@ -140,7 +140,7 @@ export default function SortableTable() {
     const filteredRows = useMemo(() => {
         return TABLE_ROWS.filter((row) =>
             Object.values(row).some((value) =>
-                value.toString().toLowerCase().includes(search.toLowerCase())
+                value !== null && value.toString().toLowerCase().includes(search.toLowerCase())
             )
         );
     }, [search, TABLE_ROWS]);
