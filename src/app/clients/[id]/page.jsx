@@ -1,5 +1,5 @@
 "use client";
-const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
@@ -18,10 +18,7 @@ const fetchClientData = async (clientId) => {
     redirect: "follow",
   };
 
-  const response = await fetch(
-    `${API_BASE_URL}/clients/${clientId}`,
-    requestOptions
-  );
+  const response = await fetch(`${API_BASE_URL}/clients/${clientId}`, requestOptions);
   const result = await response.json();
   return result[0];
 };
@@ -38,24 +35,19 @@ const updateClientData = async (clientId, data) => {
   };
 
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/clients/${clientId}`,
-      requestOptions
-    );
-    // Verificar el estado de la respuesta
+    const response = await fetch(`${API_BASE_URL}/clients/${clientId}`, requestOptions);
     if (!response.ok) {
-      // Obtener el mensaje de error del cuerpo de la respuesta
       const errorData = await response.json();
       throw errorData;
     }
 
-    // Convertir la respuesta a JSON
     const result = await response.json();
     return result;
   } catch (error) {
     throw error;
   }
 };
+
 const insertClientData = async (data) => {
   const requestOptions = {
     method: "POST",
@@ -68,23 +60,23 @@ const insertClientData = async (data) => {
   };
 
   try {
-    const response = await fetch(
-      `${API_BASE_URL}/clients/`,
-      requestOptions
-    );
-    // Verificar el estado de la respuesta
+    const response = await fetch(`${API_BASE_URL}/clients/`, requestOptions);
     if (!response.ok) {
-      // Obtener el mensaje de error del cuerpo de la respuesta
       const errorData = await response.json();
       throw errorData;
     }
 
-    // Convertir la respuesta a JSON
     const result = await response.json();
     return result;
   } catch (error) {
     throw error;
   }
+};
+
+const fetchDepartmentsAndCities = async () => {
+  const response = await fetch("https://datos.gov.co/resource/xdk5-pm3f.json");
+  const data = await response.json();
+  return data;
 };
 
 export default function ClientForm({ params }) {
@@ -96,29 +88,67 @@ export default function ClientForm({ params }) {
     formState: { errors },
   } = useForm();
   const [client, setClient] = useState(null);
-  const clientId = params.id; // Reemplaza esto con la forma en que obtienes el ID del cliente
+  const [departments, setDepartments] = useState([]);
+  const [cities, setCities] = useState([]);
+  const [departmentsWithCities, setDepartmentsWithCities] = useState({});
+  const [selectedCountry, setSelectedCountry] = useState("Colombia");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedCity, setSelectedCity] = useState(""); // Added state for selectedCity
+  const clientId = params.id;
   const router = useRouter();
 
   useEffect(() => {
     const loadClientData = async () => {
-      const clientData = await fetchClientData(clientId);
-      setClient(clientData);
+      if (clientId !== "create") {
+        const clientData = await fetchClientData(clientId);
+        setClient(clientData);
+        reset(clientData);
 
-      // Resetear el formulario con los datos del cliente
-      reset(clientData);
+        if (clientData.pais === "Colombia") {
+          setSelectedCountry("Colombia");
+          setSelectedDepartment(clientData.departamento);
+          setSelectedCity(clientData.ciudad); // Set selectedCity
+          setValue("ciudad", clientData.ciudad);
+        } else {
+          setSelectedCountry("Otro");
+        }
+      }
     };
 
     loadClientData();
-  }, [clientId, reset]);
+  }, [clientId, reset, setValue]);
+
+  useEffect(() => {
+    const loadDepartmentsAndCities = async () => {
+      const data = await fetchDepartmentsAndCities();
+      const departmentsWithCities = data.reduce((acc, item) => {
+        if (!acc[item.departamento]) {
+          acc[item.departamento] = [];
+        }
+        acc[item.departamento].push(item.municipio);
+        return acc;
+      }, {});
+      setDepartmentsWithCities(departmentsWithCities);
+      setDepartments(Object.keys(departmentsWithCities));
+    };
+
+    loadDepartmentsAndCities();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCountry === "Colombia" && selectedDepartment) {
+      setCities(departmentsWithCities[selectedDepartment] || []);
+    } else {
+      setCities([]);
+    }
+  }, [selectedDepartment, selectedCountry, departmentsWithCities]);
 
   const onSubmit = async (data) => {
-    // console.log(data);
     try {
-      if (clientId == "create") {
-        const insert = await insertClientData(data);
-        console.log(insert);
+      if (clientId === "create") {
+        await insertClientData(data);
       } else {
-        const updatedClient = await updateClientData(clientId, data);
+        await updateClientData(clientId, data);
       }
 
       MySwal.fire({
@@ -133,10 +163,7 @@ export default function ClientForm({ params }) {
       setTimeout(() => {
         router.push("/clients");
       }, 500);
-
-      // console.log("Cliente actualizado:", updatedClient);
     } catch (error) {
-      console.log(error)
       MySwal.fire({
         title: "Error guardando datos",
         icon: "error",
@@ -146,7 +173,6 @@ export default function ClientForm({ params }) {
         timer: 5000,
         timerProgressBar: false,
       });
-      // console.error("Error actualizando cliente:", error);
     }
   };
 
@@ -161,7 +187,7 @@ export default function ClientForm({ params }) {
         </button>
       </Breadcrumbs>
       <h2 className="font-bold text-2xl text-black mt-5">Cliente</h2>
-      <small className=" text-black">
+      <small className="text-black">
         Complete el siguiente formulario para este cliente
       </small>
       <form
@@ -189,7 +215,6 @@ export default function ClientForm({ params }) {
           register={register}
           errors={errors}
         />
-       
         <Input
           label="Teléfono"
           name="telefonoEstablecimiento"
@@ -220,29 +245,95 @@ export default function ClientForm({ params }) {
           register={register}
           errors={errors}
         />
-        <Input
-          label="Ciudad"
-          name="ciudad"
-          register={register}
-          errors={errors}
-        />
-        <Input
+        <select
+          {...register("pais")}
+          onChange={(e) => {
+            setSelectedCountry(e.target.value);
+            setSelectedDepartment("");
+            setSelectedCity(""); // Clear selectedCity
+            setValue("departamento", "");
+            setValue("ciudad", "");
+          }}
+          className="p-2 border border-gray-300 rounded col-span-2"
+        >
+          <option value="Colombia">Colombia</option>
+          <option value="Otro">Otro</option>
+        </select>
+        {selectedCountry === "Colombia" && (
+          <>
+            <select
+              {...register("departamento")}
+              onChange={(e) => {
+                setSelectedDepartment(e.target.value);
+                setSelectedCity(""); // Clear selectedCity
+                setValue("ciudad", "");
+              }}
+              className="p-2 border border-gray-300 rounded"
+            >
+              <option value="">Seleccione un departamento</option>
+              {departments.map((department, index) => (
+                <option key={index} value={department}>
+                  {department}
+                </option>
+              ))}
+            </select>
+            <select
+              {...register("ciudad")}
+              onChange={(e) => {
+                setSelectedCity(e.target.value); // Update selectedCity
+              }}
+              className="p-2 border border-gray-300 rounded"
+            >
+              <option value="">Seleccione una ciudad</option>
+              {cities.map((city, index) => (
+                <option key={index} value={city}>
+                  {city}
+                </option>
+              ))}
+            </select>
+            <input
+              type="hidden"
+              {...register("departamento_id")}
+              value={selectedDepartment}
+            />
+            <input
+              type="hidden"
+              {...register("ciudad_id")}
+              value={selectedCity}
+            />
+          </>
+        )}
+        {selectedCountry !== "Colombia" && (
+          <>
+            <Input
+              label="Departamento"
+              name="departamento"
+              register={register}
+              errors={errors}
+            />
+            <Input
+              label="Ciudad"
+              name="ciudad"
+              register={register}
+              errors={errors}
+            />
+          </>
+        )}
+        {/* <Input
           label="Celular"
           name="celularPropietario"
           register={register}
           errors={errors}
-        />
+        /> */}
         <Input
           label="Página Web"
           name="paginaWeb"
           register={register}
           errors={errors}
         />
-        <Input
-          label="Tipo Gestión"
-          name="tipoGestion"
-          register={register}
-          errors={errors}
+        <input
+          type="hidden"
+          {...register('tipoGestion')}
         />
         <b className="text-black col-span-2">Datos de Contacto</b>
         <Input
@@ -251,18 +342,17 @@ export default function ClientForm({ params }) {
           register={register}
           errors={errors}
         />
-         <Input
+        <Input
           label="Celular Contacto"
           name="celularPersonaContacto"
           register={register}
           errors={errors}
         />
-
-        <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Link href="../clients" className="m-2 text-black">
-            Cancelar
-          </Link>
-          <Button type="submit" color="yellow" className="m-2">
+        <div className="w-full flex justify-end mt-4">
+          <Button
+            type="submit"
+            className="bg-yellow-600 text-white hover:bg-yellow-700"
+          >
             Guardar
           </Button>
         </div>

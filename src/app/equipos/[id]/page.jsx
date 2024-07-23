@@ -121,7 +121,7 @@ const insertClientData = async (data) => {
   };
 
   const response = await fetch(
-    `${API_BASE_URL}/clients/`,
+    `${API_BASE_URL}/equipos/`,
     requestOptions
   );
   const result = await response.json();
@@ -175,6 +175,10 @@ const ROWS_PER_PAGE = 10;
   
 
   const onSubmit = async (data) => {
+    data = {
+      ...data,
+      activo:'SI'
+    }
 
     try {
       if (idEquipo == "create") {
