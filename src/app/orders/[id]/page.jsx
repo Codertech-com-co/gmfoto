@@ -109,6 +109,7 @@ const ClientForm = ({ params }) => {
     reset,
     formState: { errors },
   } = useForm();
+  const [usuarios, setUsuarios] = useState([]);
   const [order, setOrder] = useState(null);
   const idEquipo = params.id;
   const router = useRouter();
@@ -125,9 +126,18 @@ const ClientForm = ({ params }) => {
   const [requiereImportacion, setRequiereImportacion] = useState("");
   const [idCliente, setIdCliente] = useState(null);
   const [equipo, setEquipo] = useState(null);
+  const [usuario, setUsuario] = useState(null);
 
   useEffect(() => {
     const loadClientData = async () => {
+
+      let listUser = await getUsuarios();
+      listUser = Array.isArray(listUser) ? listUser.map((item) => ({
+        label: `${item.names} ${item.lastnames}`,
+        value: item.id,
+      })) : [];
+      setUsuarios(listUser);
+
       var listClients = await fetchClients();
       listClients = listClients.map((data) => ({
         label: data.razonSocial,
@@ -162,6 +172,7 @@ const ClientForm = ({ params }) => {
         setRequiereImportacion(orderData.requiere_importacion);
         setIdCliente(orderData.cliente);
         setEquipo(orderData.equipo);
+        setUsuario(orderData.persona_que_recibe);
 
         // Resetear el formulario con los datos del cliente si orderData tiene datos
         if (orderData) {
@@ -174,7 +185,7 @@ const ClientForm = ({ params }) => {
   }, [idEquipo, idCliente, equipo, reset]);
 
   const onSubmit = async (data) => {
-    console.log("Form data:", data); // Asegúrate de que esto se ejecute
+    // console.log("Form data:", data); // Asegúrate de que esto se ejecute
 
     try {
       if (idEquipo === "create") {
@@ -331,36 +342,20 @@ const ClientForm = ({ params }) => {
           rules={{ required: true }}
           setValue={setValue}
           options={[
-            { label: "Recolección domicilio", value: "recoleccion_domicilio" },
-            {
-              label: "Recolección transportadora",
-              value: "recoleccion_transportadora",
-            },
-            { label: "Recolección Cota", value: "recoleccion_cota" },
-            {
-              label: "Recolección StaFé Btá",
-              value: "recoleccion_stafe_bogota",
-            },
-            { label: "Recolección StaFé Mde", value: "recoleccion_stafe_mde" },
-            { label: "Recolección Fabricato", value: "recoleccion_fabricato" },
-            {
-              label: "Recolección Gran Estación",
-              value: "recoleccion_gran_estacion",
-            },
-            {
-              label: "Recolección Plaza Claro",
-              value: "recoleccion_plaza_claro",
-            },
+            { label: "RECOLECCION DOMICILIO", value: "RECOLECCION_DOMICILIO " },
+            { label: "ENVIO POR TRASPORTADORA", value: "ENVIO_POR_TRASPORTADORA" },
+            { label: "RECEPCION GMFOTO", value: "RECEPCION_GMFOTO" },
+           
           ]}
         />
         <Select2
           label="Persona que recibe el Producto"
           name="persona_que_recibe"
-          value={personaRecibe}
+          value={usuario}
           register={register}
           rules={{ required: true }}
           setValue={setValue}
-          options={[{ label: "Duvan Camilo Ayala", value: "123456789" }]}
+          options={usuarios}
         />
         <Select2
           label="Transportadora"

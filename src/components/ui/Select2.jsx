@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import Select from "react-tailwindcss-select";
 
 function buscarPorValue(data, value) {
-  return data ? data.filter(item => item.value === value) : [];
+  return data ? data.filter(item => item.value == value) : [];
 }
 
 const Select2 = ({ name, register, rules, options, label, setValue, ...props }) => {
@@ -22,7 +22,7 @@ const Select2 = ({ name, register, rules, options, label, setValue, ...props }) 
          parsedValue = JSON.parse(props.value);
       }
       
-      console.log(parsedValue)
+      
       const dataValue = parsedValue.map(data => buscarPorValue(options, data)[0]).filter(Boolean);
       setValueLocal(dataValue);
       setValue(name, props.value);
