@@ -212,6 +212,7 @@ export default function ClientForm({ params }) {
         <Input
           label="Nombre Establecimiento"
           name="NombreEstablecimiento"
+          rules={{ required: true }}
           register={register}
           errors={errors}
         />
@@ -219,13 +220,16 @@ export default function ClientForm({ params }) {
           label="Teléfono"
           name="telefonoEstablecimiento"
           register={register}
+          rules={{ required: true }}
           errors={errors}
         />
         <Input
           label="Correo Electrónico"
           name="email"
           register={register}
+          
           rules={{
+            required:true,
             pattern: {
               value: /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i,
               message: "Email no válido",
@@ -236,12 +240,14 @@ export default function ClientForm({ params }) {
         <Input
           label="Propietario"
           name="propietario"
+          rules={{ required: true }}
           register={register}
           errors={errors}
         />
         <Input
           label="Dirección"
           name="direccion"
+          rules={{ required: true }}
           register={register}
           errors={errors}
         />
@@ -340,12 +346,14 @@ export default function ClientForm({ params }) {
           label="Nombre persona de Contacto"
           name="nombrePersonaContacto"
           register={register}
+          rules={{ required: true }}
           errors={errors}
         />
         <Input
           label="Celular Contacto"
           name="celularPersonaContacto"
           register={register}
+          rules={{ required: true }}
           errors={errors}
         />
         <div className="w-full flex justify-end mt-4">

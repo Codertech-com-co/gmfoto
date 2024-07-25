@@ -10,7 +10,7 @@ const Input = ({ name, register, rules, label, ...props }) => {
 
       <div class="">
       <label className={`text-blue-gray-800 text-[13px]`}>
-        {label}
+        {label} {(rules && rules.required)?<b className="text-red-900">*</b>:''}
       </label>
         
           <input

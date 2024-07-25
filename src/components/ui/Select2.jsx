@@ -37,7 +37,7 @@ const Select2 = ({ name, register, rules, options, label, setValue, ...props }) 
 
   return (
     <div>
-      <label className="text-blue-gray-800 text-[13px]">{label}</label>
+      <label className="text-blue-gray-800 text-[13px]">{label}</label>{(rules && rules.required)?<b className="text-red-900">*</b>:''}
       <Select
         {...props}
         value={value}

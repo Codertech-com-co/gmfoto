@@ -3,13 +3,19 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import Link from "next/link";
-import { useForm,useFieldArray  } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../components/ui/Input";
 import Select2 from "../../../components/ui/Select2";
 import Select from "../../../components/ui/Select";
 import Textarea from "../../../components/ui/Textarea";
-import { Button, Breadcrumbs, Typography ,TextField ,MenuItem } from "@material-tailwind/react";
+import {
+  Button,
+  Breadcrumbs,
+  Typography,
+  TextField,
+  MenuItem,
+} from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
 import { fetchClients } from "../../../utils/api/clients";
 import { fetchEquipos } from "../../../utils/api/equipos";
@@ -21,7 +27,7 @@ import {
   Tab,
   TabPanel,
 } from "@material-tailwind/react";
-import { v4 as uuidv4 } from 'uuid'; // Asegúrate de instalar la librería uuid
+import { v4 as uuidv4 } from "uuid"; // Asegúrate de instalar la librería uuid
 
 const MySwal = withReactContent(Swal);
 
@@ -107,6 +113,7 @@ const ClientForm = ({ params }) => {
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { errors },
   } = useForm();
   const [usuarios, setUsuarios] = useState([]);
@@ -130,12 +137,13 @@ const ClientForm = ({ params }) => {
 
   useEffect(() => {
     const loadClientData = async () => {
-
       let listUser = await getUsuarios();
-      listUser = Array.isArray(listUser) ? listUser.map((item) => ({
-        label: `${item.names} ${item.lastnames}`,
-        value: item.id,
-      })) : [];
+      listUser = Array.isArray(listUser)
+        ? listUser.map((item) => ({
+            label: `${item.names} ${item.lastnames}`,
+            value: item.id,
+          }))
+        : [];
       setUsuarios(listUser);
 
       var listClients = await fetchClients();
@@ -231,6 +239,12 @@ const ClientForm = ({ params }) => {
     }
   };
 
+  const onBeforeSubmit = () => {
+    const currentValues = getValues();
+    // console.log(data);
+    setProcesoLogistico(currentValues.proceso_logistico);
+  };
+
   return (
     <div>
       <h2 className="font-bold text-2xl text-blue-gray-800 mt-5">
@@ -240,6 +254,7 @@ const ClientForm = ({ params }) => {
         Complete el siguiente formulario
       </small>
       <form
+        onChange={()=>onBeforeSubmit()}
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
@@ -319,8 +334,24 @@ const ClientForm = ({ params }) => {
           errors={errors}
           options={equipos}
         />
-
         <br />
+        <Select2
+          label="Proceso Logístico"
+          name="proceso_logistico"
+          register={register}
+          value={procesoLogistico}
+          rules={{ required: true }}
+          setValue={setValue}
+          options={[
+            { label: "RECOLECCION DOMICILIO", value: "RECOLECCION_DOMICILIO" },
+            {
+              label: "ENVIO POR TRASPORTADORA",
+              value: "ENVIO_POR_TRASPORTADORA",
+            },
+            { label: "RECEPCION GMFOTO", value: "RECEPCION_GMFOTO" },
+          ]}
+        />
+
         <Textarea
           name="accesorios"
           register={register}
@@ -332,22 +363,10 @@ const ClientForm = ({ params }) => {
           label="Falla Reportada"
           name="falla_reportada"
           register={register}
-          rules={{ required: false }}
-        />
-        <Select2
-          label="Proceso Logístico"
-          name="proceso_logistico"
-          register={register}
-          value={procesoLogistico}
+          errors={errors}
           rules={{ required: true }}
-          setValue={setValue}
-          options={[
-            { label: "RECOLECCION DOMICILIO", value: "RECOLECCION_DOMICILIO " },
-            { label: "ENVIO POR TRASPORTADORA", value: "ENVIO_POR_TRASPORTADORA" },
-            { label: "RECEPCION GMFOTO", value: "RECEPCION_GMFOTO" },
-           
-          ]}
         />
+
         <Select2
           label="Persona que recibe el Producto"
           name="persona_que_recibe"
@@ -357,28 +376,36 @@ const ClientForm = ({ params }) => {
           setValue={setValue}
           options={usuarios}
         />
-        <Select2
-          label="Transportadora"
-          name="transportadora"
-          register={register}
-          value={trasportadora}
-          rules={{ required: true }}
-          setValue={setValue}
-          options={[
-            { label: "TCC", value: "TCC" },
-            { label: "SERVIENTREGA", value: "SERVIENTREGA" },
-            { label: "INTERRAPIDISIMO", value: "INTERRAPIDISIMO" },
-            { label: "COORDINADORA", value: "COORDINADORA" },
-            { label: "ENVIA", value: "ENVIA" },
-            { label: "DEPRISA", value: "DEPRISA" },
-          ]}
-        />
-        <Input
-          label="Guía de Envió"
-          name="guia"
-          register={register}
-          rules={{ required: false }}
-        />
+
+        {procesoLogistico != "RECOLECCION_DOMICILIO" ? (
+          <>
+            <Select2
+              label="Transportadora"
+              name="transportadora"
+              register={register}
+              value={trasportadora}
+              // rules={{ required: true }}
+              setValue={setValue}
+              options={[
+                { label: "TCC", value: "TCC" },
+                { label: "SERVIENTREGA", value: "SERVIENTREGA" },
+                { label: "INTERRAPIDISIMO", value: "INTERRAPIDISIMO" },
+                { label: "COORDINADORA", value: "COORDINADORA" },
+                { label: "ENVIA", value: "ENVIA" },
+                { label: "DEPRISA", value: "DEPRISA" },
+              ]}
+            />
+            <Input
+              label="Guía de Envió"
+              name="guia"
+              register={register}
+              rules={{ required: false }}
+            />
+          </>
+        ) : (
+          <></>
+        )}
+
         <Select2
           label="Estado del Producto"
           name="estado_del_producto"
@@ -414,7 +441,7 @@ const ClientForm = ({ params }) => {
           label="Requiere Importación"
           name="requiere_importacion"
           register={register}
-          rules={{ required: true }}
+          // rules={{ required: true }}
           setValue={setValue}
           value={requiereImportacion}
           options={[
@@ -482,7 +509,10 @@ const getLabores = async (order) => {
     credentials: "include",
   };
   try {
-    const response = await fetch(API_BASE_URL + "/labores/"+order, requestOptions);
+    const response = await fetch(
+      API_BASE_URL + "/labores/" + order,
+      requestOptions
+    );
     if (!response.ok) {
       const errorData = await response.json();
       throw errorData;
@@ -495,18 +525,20 @@ const getLabores = async (order) => {
   }
 };
 
-function Bitacora({params}) {
-  const order_id = params.id
+function Bitacora({ params }) {
+  const order_id = params.id;
   const [usuarios, setUsuarios] = useState([]);
   const [labores, setLabores] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
       let listUser = await getUsuarios();
-      listUser = Array.isArray(listUser) ? listUser.map((item) => ({
-        label: `${item.names} ${item.lastnames}`,
-        value: item.id,
-      })) : [];
+      listUser = Array.isArray(listUser)
+        ? listUser.map((item) => ({
+            label: `${item.names} ${item.lastnames}`,
+            value: item.id,
+          }))
+        : [];
       setUsuarios(listUser);
 
       let listLabores = await getLabores(order_id);
@@ -534,33 +566,35 @@ function Bitacora({params}) {
 
   const saveLabores = () => {
     console.log("Labores guardadas:", labores);
-    labores.map(async(item) =>{
+    labores.map(async (item) => {
       item = {
         ...item,
-        order_id
-      }
+        order_id,
+      };
 
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/labores`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(item),
-          credentials: "include",
-        });
-    
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/labores`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(item),
+            credentials: "include",
+          }
+        );
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    
+
         return await response.json();
       } catch (error) {
-        console.error('Error posting transaction:', error);
+        console.error("Error posting transaction:", error);
         throw error;
       }
-
-    })
+    });
   };
 
   return (
@@ -685,77 +719,79 @@ export default function TabsCustomAnimation({ params }) {
   );
 }
 
-
-
-
-
-
-
 const fetchProducts = async () => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/productos/all`,{
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/productos/all`,
+      {
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Fetched products:', data);
 
     if (!Array.isArray(data)) {
-      throw new Error('Invalid data format: Expected an array');
+      throw new Error("Invalid data format: Expected an array");
     }
 
-    return data.map(product => ({
+    return data.map((product) => ({
       label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
       value: product.id,
-      cantidadDisponible: product.cantidad_disponible
+      cantidadDisponible: product.cantidad_disponible,
     }));
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     return [];
   }
 };
 const fetchProductsOrder = async (order) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones/numero_referencia/${order}`,{
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones/numero_referencia/${order}`,
+      {
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
-    console.log('Fetched products:', data);
+    console.log("Fetched products:", data);
 
     if (!Array.isArray(data)) {
-      throw new Error('Invalid data format: Expected an array');
+      throw new Error("Invalid data format: Expected an array");
     }
 
-    return data.map(product => ({
+    return data.map((product) => ({
       label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
       value: product.id,
-      cantidadDisponible: product.cantidad_disponible
+      cantidadDisponible: product.cantidad_disponible,
     }));
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error("Error fetching products:", error);
     return [];
   }
 };
 
 const postTransaction = async (transaction) => {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(transaction),
-      credentials: "include",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/transacciones`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(transaction),
+        credentials: "include",
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
@@ -763,26 +799,32 @@ const postTransaction = async (transaction) => {
 
     return await response.json();
   } catch (error) {
-    console.error('Error posting transaction:', error);
+    console.error("Error posting transaction:", error);
     throw error;
   }
 };
 
 const RepuestosTab = ({ params, userName }) => {
-  const orderId = params.id
+  const orderId = params.id;
   const [productos, setProductos] = useState([]);
   const [repuestos, setRepuestos] = useState([]);
-  const { register, handleSubmit, setValue, getValues, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm();
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
         const productList = await fetchProducts();
         setProductos(productList);
-        const repuestosList = await fetchProductsOrder(orderId)
-        setRepuestos(repuestosList)
+        const repuestosList = await fetchProductsOrder(orderId);
+        setRepuestos(repuestosList);
       } catch (error) {
-        console.error('Failed to fetch products:', error);
+        console.error("Failed to fetch products:", error);
       }
     };
 
@@ -790,13 +832,13 @@ const RepuestosTab = ({ params, userName }) => {
   }, []);
 
   const handleAddRepuesto = async (data) => {
-    console.log(data)
-    const producto = productos.find(p => p.value === data.producto);
+    console.log(data);
+    const producto = productos.find((p) => p.value === data.producto);
     if (!producto) {
       MySwal.fire({
         title: "Error",
         text: "Producto no encontrado.",
-        icon: "error"
+        icon: "error",
       });
       return;
     }
@@ -805,7 +847,7 @@ const RepuestosTab = ({ params, userName }) => {
       MySwal.fire({
         title: "Error",
         text: "Cantidad excede el stock disponible.",
-        icon: "error"
+        icon: "error",
       });
       return;
     }
@@ -814,7 +856,7 @@ const RepuestosTab = ({ params, userName }) => {
       id: uuidv4(),
       id_producto: data.producto,
       cantidad: data.cantidad,
-      orden_id: orderId
+      orden_id: orderId,
     };
 
     try {
@@ -825,64 +867,76 @@ const RepuestosTab = ({ params, userName }) => {
         id_proveedor: 1, // Puedes cambiar esto si tienes el id del proveedor
         cantidad: data.cantidad,
         cantidad_stock: data.cantidad,
-        numero_referencia: orderId
+        numero_referencia: orderId,
       };
-      
+
       await postTransaction(transaction);
       setRepuestos([...repuestos, nuevoRepuesto]);
-      setValue('producto', '');
-      setValue('cantidad', '');
+      setValue("producto", "");
+      setValue("cantidad", "");
       MySwal.fire({
         title: "Éxito",
         text: "Repuesto agregado exitosamente.",
-        icon: "success"
+        icon: "success",
       });
     } catch (error) {
       MySwal.fire({
         title: "Error",
         text: `No se pudo agregar el repuesto: ${error.message}`,
-        icon: "error"
+        icon: "error",
       });
     }
   };
 
   const handleRemoveRepuesto = (id) => {
-    setRepuestos(repuestos.filter(r => r.id !== id));
+    setRepuestos(repuestos.filter((r) => r.id !== id));
   };
 
   return (
     <div>
-      <Typography variant="h4" className="mb-4">Repuestos</Typography>
+      <Typography variant="h4" className="mb-4">
+        Repuestos
+      </Typography>
 
-      <form onSubmit={handleSubmit(handleAddRepuesto)} className="space-y-4 mb-4">
+      <form
+        onSubmit={handleSubmit(handleAddRepuesto)}
+        className="space-y-4 mb-4"
+      >
         <div className="w-full">
-          <label htmlFor="producto" className="block text-gray-700">Producto</label>
+          <label htmlFor="producto" className="block text-gray-700">
+            Producto
+          </label>
           <Select
             id="producto"
-            name={'producto'}
+            name={"producto"}
             register={register}
             rules={{ required: true }}
             isClearable
             options={productos}
             className="w-full"
           />
-          {errors.producto && <p className="text-red-500">{errors.producto.message}</p>}
+          {errors.producto && (
+            <p className="text-red-500">{errors.producto.message}</p>
+          )}
         </div>
 
         <div className="w-full">
-          <label htmlFor="cantidad" className="block text-gray-700">Cantidad</label>
+          <label htmlFor="cantidad" className="block text-gray-700">
+            Cantidad
+          </label>
           <Input
             id="cantidad"
             type="number"
             min="1"
-            name={'cantidad'}
+            name={"cantidad"}
             register={register}
             rules={{ required: true }}
-            
             placeholder="Cantidad"
             className="w-full"
           />
-          {errors.cantidad && <p className="text-red-500">{errors.cantidad.message}</p>}
+          {errors.cantidad && (
+            <p className="text-red-500">{errors.cantidad.message}</p>
+          )}
         </div>
 
         <Button type="submit" color="yellow" variant="contained">
@@ -890,7 +944,9 @@ const RepuestosTab = ({ params, userName }) => {
         </Button>
       </form>
 
-      <Typography variant="h5" className="mb-2">Repuestos Agregados</Typography>
+      <Typography variant="h5" className="mb-2">
+        Repuestos Agregados
+      </Typography>
       <table className="w-full text-center border-collapse border border-gray-200">
         <thead>
           <tr>
@@ -900,14 +956,19 @@ const RepuestosTab = ({ params, userName }) => {
           </tr>
         </thead>
         <tbody>
-          {repuestos.map(repuesto => (
+          {repuestos.map((repuesto) => (
             <tr key={repuesto.id}>
               <td className="border border-gray-300 p-2">
-                {productos.find(p => p.value === repuesto.id_producto)?.label}
+                {productos.find((p) => p.value === repuesto.id_producto)?.label}
               </td>
-              <td className="border border-gray-300 p-2">{repuesto.cantidad}</td>
               <td className="border border-gray-300 p-2">
-                <Button color="red" onClick={() => handleRemoveRepuesto(repuesto.id)}>
+                {repuesto.cantidad}
+              </td>
+              <td className="border border-gray-300 p-2">
+                <Button
+                  color="red"
+                  onClick={() => handleRemoveRepuesto(repuesto.id)}
+                >
                   Eliminar
                 </Button>
               </td>

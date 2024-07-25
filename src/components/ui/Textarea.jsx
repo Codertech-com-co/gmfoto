@@ -10,6 +10,7 @@ const Textarea = ({ name, register, rules, label, ...props }) => {
         {label && (
           <label className={`text-blue-gray-800 text-[13px]`}>{label}</label>
         )}
+        {(rules && rules.required)?<b className="text-red-900">*</b>:''}
 
         <textarea
           {...(register && register(name, rules))}
