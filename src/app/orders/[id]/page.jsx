@@ -739,7 +739,7 @@ const fetchProducts = async () => {
     }
 
     return data.map((product) => ({
-      label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
+      label: `Marca: ${product.marca} Referencia: ${product.referencia} Nombre: ${product.nombre} Modelo: ${product.modelo} (STOCK: ${product.cantidad_disponible})`,
       value: product.id,
       cantidadDisponible: product.cantidad_disponible,
     }));
