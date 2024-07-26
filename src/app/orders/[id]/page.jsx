@@ -254,7 +254,7 @@ const ClientForm = ({ params }) => {
         Complete el siguiente formulario
       </small>
       <form
-        onChange={()=>onBeforeSubmit()}
+        onChange={() => onBeforeSubmit()}
         onSubmit={handleSubmit(onSubmit)}
         className="p-5 mt-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2"
       >
@@ -903,10 +903,15 @@ const RepuestosTab = ({ params, userName }) => {
         className="space-y-4 mb-4"
       >
         <div className="w-full">
-          <label htmlFor="producto" className="block text-gray-700">
-            Producto
-          </label>
-          <Select
+         
+          <Select2 
+          label={'Producto'}
+          name={'producto'}
+          rules={{ required: true }}
+          setValue={setValue}
+          options={productos}
+          />
+          {/* <Select
             id="producto"
             name={"producto"}
             register={register}
@@ -914,7 +919,7 @@ const RepuestosTab = ({ params, userName }) => {
             isClearable
             options={productos}
             className="w-full"
-          />
+          /> */}
           {errors.producto && (
             <p className="text-red-500">{errors.producto.message}</p>
           )}
@@ -932,14 +937,14 @@ const RepuestosTab = ({ params, userName }) => {
             register={register}
             rules={{ required: true }}
             placeholder="Cantidad"
-            className="w-full"
+            
           />
           {errors.cantidad && (
             <p className="text-red-500">{errors.cantidad.message}</p>
           )}
         </div>
 
-        <Button type="submit" color="yellow" variant="contained">
+        <Button type="submit" color="black" variant="contained">
           Agregar
         </Button>
       </form>
