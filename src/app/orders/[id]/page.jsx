@@ -771,7 +771,9 @@ const fetchProductsOrder = async (order) => {
     return data.map((product) => ({
       label: `${product.nombre} (Disponible: ${product.cantidad_disponible})`,
       value: product.id,
+      id_producto: product.id,
       cantidadDisponible: product.cantidad_disponible,
+      cantidad: product.cantidad,
     }));
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -820,6 +822,7 @@ const RepuestosTab = ({ params, userName }) => {
     const loadProducts = async () => {
       try {
         const productList = await fetchProducts();
+        
         setProductos(productList);
         const repuestosList = await fetchProductsOrder(orderId);
         setRepuestos(repuestosList);

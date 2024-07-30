@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import Input from "../../../../components/ui/Input";
-import Select from "../../../../components/ui/Select2";
+import Select2 from "../../../../components/ui/Select2";
+import Select from "../../../../components/ui/Select";
 import Textarea from "../../../../components/ui/Textarea";
 import { Button, Breadcrumbs } from "@material-tailwind/react";
 import { useRouter } from "next/navigation";
@@ -21,7 +22,10 @@ const fetchProductData = async (idProducto) => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/productos/${idProducto}`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/productos/${idProducto}`,
+    requestOptions
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
@@ -38,7 +42,10 @@ const fetchCategories = async () => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/categorias/all`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/categorias/all`,
+    requestOptions
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
@@ -59,7 +66,10 @@ const updateProductData = async (idProducto, data) => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/productos/${idProducto}`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/productos/${idProducto}`,
+    requestOptions
+  );
   const result = await response.json();
   return result;
 };
@@ -75,9 +85,18 @@ const insertProductData = async (data) => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/productos`, requestOptions);
-  const result = await response.json();
-  return result;
+  try {
+    const response = await fetch(`${API_BASE_URL}/productos`, requestOptions);
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw errorData;
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    throw error;
+  }
 };
 
 // Nueva función para manejar el archivo Excel
@@ -87,7 +106,7 @@ const uploadExcel = async (file) => {
     const workbook = XLSX.read(data, { type: "array" });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const json = XLSX.utils.sheet_to_json(worksheet);
-    
+
     // Aquí puedes realizar las validaciones necesarias para los datos
     for (const row of json) {
       await insertProductData(row);
@@ -104,7 +123,7 @@ const uploadExcel = async (file) => {
     });
   } catch (error) {
     MySwal.fire({
-      title: "Error al importar datos",
+      title: "Error al importar datos, " + error.message,
       icon: "error",
       toast: true,
       position: "bottom",
@@ -112,7 +131,7 @@ const uploadExcel = async (file) => {
       timer: 5000,
       timerProgressBar: false,
     });
-    console.error("Error importando datos:", error);
+    // console.error("Error importando datos:", error);
   }
 };
 
@@ -170,19 +189,37 @@ export default function ProductForm({ params }) {
       });
 
       setTimeout(() => {
-        router.push('/inventory');
+        router.push("/inventory");
       }, 500);
     } catch (error) {
-      MySwal.fire({
-        title: "Error guardando producto",
-        icon: "error",
-        toast: true,
-        position: "bottom",
-        showConfirmButton: false,
-        timer: 5000,
-        timerProgressBar: false,
-      });
-      console.error("Error guardando producto:", error);
+      console.log(error.message.indexOf("ya se encuenta"));
+      if (error.message && error.message.indexOf("ya se encuentra") > 0) {
+        MySwal.fire({
+          title: "Error guardando producto, " + error.message,
+          html:
+            "<a href='/inventory/products/" +
+            error.data[0].id +
+            "'>Modifiquelo dando clic aqui</a>",
+          icon: "error",
+          toast: true,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 5000,
+          timerProgressBar: false,
+        });
+      } else {
+        MySwal.fire({
+          title: "Error guardando producto, " + error.message,
+          icon: "error",
+          toast: true,
+          position: "bottom",
+          showConfirmButton: false,
+          timer: 5000,
+          timerProgressBar: false,
+        });
+      }
+
+      // console.error("Error guardando producto:", error);
     }
   };
 
@@ -239,15 +276,15 @@ export default function ProductForm({ params }) {
           rules={{ required: true }}
           errors={errors}
         />
-        <Select
+        <Select2
           label={"Categoría"}
           name={"id_categoria"}
           setValue={setValue}
           register={register}
           rules={{ required: true }}
-          options={categories.map(category => ({
+          options={categories.map((category) => ({
             label: category.nombre,
-            value: category.id
+            value: category.id,
           }))}
         />
         <Input
@@ -282,12 +319,32 @@ export default function ProductForm({ params }) {
           type="number"
           step="0.01"
         />
-        <Textarea
+        {/* <Textarea
           label={"Descripción"}
           name={"descripcion"}
           register={register}
           rules={{ required: false }}
-        />
+        /> */}
+        <div>
+          <small>Descripción</small>
+          <Select
+            // label={"Descripción"}
+            name={"descripcion"}
+            register={register}
+            rules={{ required: false }}
+            options={[
+              {
+                label: "REPUESTO NIKON",
+                value: "REPUESTO NIKON",
+              },
+              {
+                label: "REPUESTO OTRAS MARCAS",
+                value: "REPUESTO OTRAS MARCAS",
+              },
+            ]}
+          />
+        </div>
+
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
           <Link href="../" className="m-2 text-black">
             Cancelar
