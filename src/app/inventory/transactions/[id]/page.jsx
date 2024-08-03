@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useForm } from "react-hook-form";
-import { Button, Typography,Breadcrumbs } from "@material-tailwind/react";
+import { Button, Typography, Breadcrumbs } from "@material-tailwind/react";
 import Input from "../../../../components/ui/Input";
-import Select from "../../../../components/ui/Select2";
+import Select2 from "../../../../components/ui/Select2";
+import Select from "../../../../components/ui/Select";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -19,7 +20,10 @@ const fetchTransaction = async (id) => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/transacciones/${id}`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/transacciones/${id}`,
+    requestOptions
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
@@ -53,7 +57,10 @@ const fetchProviders = async () => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/proveedores/all`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/proveedores/all`,
+    requestOptions
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
@@ -74,7 +81,10 @@ const updateTransaction = async (id, data) => {
     credentials: "include",
   };
 
-  const response = await fetch(`${API_BASE_URL}/transacciones/${id}`, requestOptions);
+  const response = await fetch(
+    `${API_BASE_URL}/transacciones/${id}`,
+    requestOptions
+  );
   if (!response.ok) {
     const errorData = await response.json();
     throw errorData;
@@ -120,7 +130,10 @@ export default function TransactionForm({ params }) {
   useEffect(() => {
     const loadOptions = async () => {
       try {
-        const [productsData, providersData] = await Promise.all([fetchProducts(), fetchProviders()]);
+        const [productsData, providersData] = await Promise.all([
+          fetchProducts(),
+          fetchProviders(),
+        ]);
         setProducts(productsData);
         setProviders(providersData);
 
@@ -173,7 +186,7 @@ export default function TransactionForm({ params }) {
         timerProgressBar: false,
       });
 
-      router.push('/inventory/transactions');
+      router.push("/inventory/transactions");
     } catch (error) {
       MySwal.fire({
         title: "Error guardando datos",
@@ -190,41 +203,76 @@ export default function TransactionForm({ params }) {
 
   return (
     <div className="p-6">
-          <Breadcrumbs>
-                <Link href="/inventory/proveedores" className="opacity-60 hover:text-yellow-900">
-                    Lista transacciones
-                </Link>
-                <button className="opacity-60" disabled>
-                    Transaccion
-                </button>
-            </Breadcrumbs>
+      <Breadcrumbs>
+        <Link
+          href="/inventory/"
+          className="opacity-60 hover:text-yellow-900"
+        >
+          Inventario
+        </Link>
+        <Link
+          href="/inventory/transactions"
+          className="opacity-60 hover:text-yellow-900"
+        >
+          Lista transacciones
+        </Link>
+        <button className="opacity-60" disabled>
+          Transaccion
+        </button>
+      </Breadcrumbs>
+      <br />
       <Typography variant="h3" color="blue-gray">
-        {idTransaction === "create" ? "Crear Transacción de Inventario" : "Editar Transacción"}
+        {idTransaction === "create"
+          ? "Crear Transacción de Inventario"
+          : "Editar Transacción"}
       </Typography>
       <form
         onSubmit={handleSubmit(onSubmit)}
         className="mt-6 p-5 grid grid-cols-1 md:grid-cols-2 gap-4 border-dashed rounded-lg border-2 bg-white"
       >
-        <Select
+        <div>
+          <label htmlFor="" style={{ fontSize: "12px" }}>
+            Tipo de transaccion <b className="text-red-900">*</b>
+          </label>
+          <Select
+            label={""}
+            name="tipo"
+            register={register}
+            rules={{ required: true }}
+            options={[
+              {
+                label: "ENTRADA",
+                value: "ENTRADA",
+              },
+              {
+                label: "SALIDA",
+                value: "SALIDA",
+              },
+            ]}
+          />
+        </div>
+        <br />
+
+        <Select2
           label="Producto"
           name="id_producto"
           setValue={setValue}
           register={register}
           rules={{ required: true }}
-          options={products.map(product => ({
+          options={products.map((product) => ({
             label: `${product.marca} - ${product.referencia}`, // Ajusta según los datos disponibles
-            value: product.id
+            value: product.id,
           }))}
         />
-        <Select
+        <Select2
           label="Proveedor"
           name="id_proveedor"
           setValue={setValue}
           register={register}
-          rules={{ required: true }}
-          options={providers.map(provider => ({
+          rules={{ required: false }}
+          options={providers.map((provider) => ({
             label: provider.nombre_empresa, // Ajusta según los datos disponibles
-            value: provider.id
+            value: provider.id,
           }))}
         />
         <Input
@@ -239,7 +287,7 @@ export default function TransactionForm({ params }) {
           label="Cantidad en Stock"
           name="cantidad_stock"
           register={register}
-          rules={{ required: true }}
+          rules={{ required: false }}
           type="number"
           step="1"
         />
@@ -247,17 +295,20 @@ export default function TransactionForm({ params }) {
           label="Número de Referencia"
           name="numero_referencia"
           register={register}
-          rules={{ required: true }}
+          rules={{ required: false }}
         />
         <Input
-          label="Creador"
+          label=""
           name="creado_por"
+          hidden
           register={register}
-          rules={{ required: true }}
+          rules={{ required: false }}
         />
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
-          <Button type="submit" color="yellow" className="m-2">
-            {idTransaction === "create" ? "Crear Transacción" : "Actualizar Transacción"}
+          <Button type="submit" color="black" className="m-2">
+            {idTransaction === "create"
+              ? "Crear Transacción"
+              : "Actualizar Transacción"}
           </Button>
         </div>
       </form>

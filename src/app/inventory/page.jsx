@@ -194,7 +194,7 @@ export default function Inventory() {
               <Link href={"./inventory/products/create"} className="w-full p-3">Crear Producto</Link>
               <Link href={"./inventory/categories"} className="w-full p-3">Crear Categorías</Link>
               <Link href={"./inventory/proveedores"} className="w-full p-3">Crear Proveedores</Link>
-              <Link href={"./inventory/transactions"} className="w-full p-3">Subir Inventario</Link>
+              <Link href={"./inventory/transactions"} className="w-full p-3">Inventario</Link>
             </MenuList>
           </Menu>
 

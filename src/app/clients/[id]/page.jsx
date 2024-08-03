@@ -164,8 +164,9 @@ export default function ClientForm({ params }) {
         router.push("/clients");
       }, 500);
     } catch (error) {
+      // console.log(error)
       MySwal.fire({
-        title: "Error guardando datos",
+        title: "Error guardando datos: " + error.description,
         icon: "error",
         toast: true,
         position: "bottom",
@@ -173,6 +174,38 @@ export default function ClientForm({ params }) {
         timer: 5000,
         timerProgressBar: false,
       });
+    }
+  };
+
+  const validarDocumento = async (e) => {
+    const documento = e.target.value;
+
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/clients/verificarDocument/` + documento,
+        requestOptions
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw errorData;
+      }
+
+      const result = await response.json();
+    } catch (error) {
+      MySwal.fire({
+        title:"Error",
+        icon:"error",
+        text:error.message
+      })
     }
   };
 
@@ -201,6 +234,7 @@ export default function ClientForm({ params }) {
           register={register}
           rules={{ required: true }}
           errors={errors}
+          onBlur={validarDocumento}
         />
         <Input
           label="Razón Social"
@@ -356,10 +390,17 @@ export default function ClientForm({ params }) {
           rules={{ required: true }}
           errors={errors}
         />
-        <div className="w-full flex justify-end mt-4">
+        <div className="w-full flex justify-end mt-4 col-span-2">
+          <Link
+          href={'/clients'}
+            
+            className="bg-white font-bold text-gray-800 hover:bg-white p-2 rounded-lg mr-2"
+          >
+            Cancelar
+          </Link>
           <Button
             type="submit"
-            className="bg-yellow-600 text-white hover:bg-yellow-700"
+            className="bg-black text-white hover:bg-black"
           >
             Guardar
           </Button>

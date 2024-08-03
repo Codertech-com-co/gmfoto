@@ -168,8 +168,40 @@ export default function ProductForm({ params }) {
     loadProductData();
   }, [idProducto, reset]);
 
+  const validarReferencia = async (e) => {
+    const referencia = e.target.value;
+
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      redirect: "follow",
+      credentials: "include",
+    };
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/productos/validate/` + referencia,
+        requestOptions
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw errorData;
+      }
+
+      const result = await response.json();
+    } catch (error) {
+      MySwal.fire({
+        title:"Error",
+        icon:"error",
+        text:error.message
+      })
+    }
+  };
+
   const onSubmit = async (data) => {
-    console.log("Datos enviados:", data);
+    // console.log("Datos enviados:", data);
 
     try {
       if (idProducto === "create") {
@@ -259,6 +291,7 @@ export default function ProductForm({ params }) {
           label="Referencia"
           name="referencia"
           register={register}
+          onBlur={validarReferencia}
           rules={{ required: true }}
           errors={errors}
         />

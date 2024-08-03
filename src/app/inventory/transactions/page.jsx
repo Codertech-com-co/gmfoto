@@ -46,7 +46,7 @@ export default function Transactions() {
       } catch (error) {
         console.error("Error fetching transactions:", error);
         MySwal.fire({
-          title: "Error cargando transacciones",
+          title: error.message,
           icon: "error",
           toast: true,
           position: "bottom",
@@ -108,12 +108,13 @@ export default function Transactions() {
           Transacciones
         </button>
       </Breadcrumbs>
+      <br />
       <div className="flex items-center justify-between">
         <Typography variant="h3" color="blue-gray">
           Transacciones
         </Typography>
         <Link href="/inventory/transactions/create">
-          <Button color="yellow" className="bg-yellow-500 text-black">
+          <Button color="black" >
             Crear Transacción
           </Button>
         </Link>
