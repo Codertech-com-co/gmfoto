@@ -107,7 +107,7 @@ const insertClientData = async (data) => {
   }
 };
 
-const ClientForm = ({ params }) => {
+const ClientForm = ({ params, usuarios }) => {
   const {
     register,
     handleSubmit,
@@ -115,86 +115,89 @@ const ClientForm = ({ params }) => {
     reset,
     getValues,
     formState: { errors },
-  } = useForm();
-  const [usuarios, setUsuarios] = useState([]);
-  const [order, setOrder] = useState(null);
-  const idEquipo = params.id;
-  const router = useRouter();
-  const [clients, setClients] = useState([]);
-  const [equipos, setEquipos] = useState([]);
-  const [area, setArea] = useState("");
-  const [tipo, setTipo] = useState("");
-  const [etapa, setEtapa] = useState("");
-  const [procesoLogistico, setProcesoLogistico] = useState("");
-  const [personaRecibe, setPersonaRecibe] = useState("");
-  const [trasportadora, setTrasportadora] = useState("");
-  // const [estadoProducto, setEstadoProducto] = useState(`"['POR_VALIDAR']"`);
-  const [estadoProducto, setEstadoProducto] = useState(["POR_VALIDAR"]);
-  const [requiereImportacion, setRequiereImportacion] = useState("");
-  const [idCliente, setIdCliente] = useState(null);
-  const [equipo, setEquipo] = useState(null);
-  const [usuario, setUsuario] = useState(null);
+  } = useForm(); // Inicializa useForm para manejar el formulario
+  // const [usuarios, setUsuarios] = useState([]); // Estado para almacenar la lista de usuarios
+  const [order, setOrder] = useState(null); // Estado para almacenar la orden
+  const idEquipo = params.id; // Obtiene el ID del equipo desde los parámetros de la URL
+  const router = useRouter(); // Inicializa useRouter para la navegación
+  const [clients, setClients] = useState([]); // Estado para almacenar la lista de clientes
+  const [equipos, setEquipos] = useState([]); // Estado para almacenar la lista de equipos
+  const [area, setArea] = useState(""); // Estado para almacenar el área seleccionada
+  const [tipo, setTipo] = useState(""); // Estado para almacenar el tipo seleccionado
+  const [etapa, setEtapa] = useState(""); // Estado para almacenar la etapa seleccionada
+  const [procesoLogistico, setProcesoLogistico] = useState(""); // Estado para almacenar el proceso logístico seleccionado
+  const [personaRecibe, setPersonaRecibe] = useState(""); // Estado para almacenar la persona que recibe
+  const [trasportadora, setTrasportadora] = useState(""); // Estado para almacenar la transportadora seleccionada
+  const [estadoProducto, setEstadoProducto] = useState(["POR_VALIDAR"]); // Estado para almacenar el estado del producto
+  const [requiereImportacion, setRequiereImportacion] = useState(""); // Estado para almacenar si requiere importación
+  const [idCliente, setIdCliente] = useState(null); // Estado para almacenar el ID del cliente
+  const [equipo, setEquipo] = useState(null); // Estado para almacenar el equipo seleccionado
+  const [usuario, setUsuario] = useState(null); // Estado para almacenar el usuario seleccionado
 
   useEffect(() => {
     const loadClientData = async () => {
-      let listUser = await getUsuarios();
-      listUser = Array.isArray(listUser)
-        ? listUser.map((item) => ({
-            label: `${item.names} ${item.lastnames}`,
-            value: item.id,
-          }))
-        : [];
-      setUsuarios(listUser);
+      // let listUser = await getUsuarios(); // Carga la lista de usuarios
+      // listUser = Array.isArray(listUser)
+      //   ? listUser.map((item) => ({
+      //       label: `${item.names} ${item.lastnames}`, // Mapea la lista de usuarios para obtener un formato amigable
+      //       value: item.id,
+      //     }))
+      //   : [];
+      // setUsuarios(listUser); // Actualiza el estado con la lista de usuarios
 
-      var listClients = await fetchClients();
+      var listClients = await fetchClients(); // Carga la lista de clientes
       listClients = listClients.map((data) => ({
         label: data.razonSocial,
         value: data.id,
       }));
-      setClients(listClients);
+      setClients(listClients); // Actualiza el estado con la lista de clientes
 
-      var listEquipos = await fetchEquipos();
+      var listEquipos = await fetchEquipos(); // Carga la lista de equipos
       listEquipos = listEquipos.map((data) => ({
         label: data.serial,
         value: data.id,
       }));
-      setEquipos(listEquipos);
+      setEquipos(listEquipos); // Actualiza el estado con la lista de equipos
+
       if (idEquipo !== "create") {
-        const orderData = await fetchClientData(idEquipo);
+        const orderData = await fetchClientData(idEquipo); // Si no es una creación, carga los datos del cliente
         let dataOrder = {
           ...orderData,
           fecha_cierre: orderData.fecha_cierre
             ? orderData.fecha_cierre.split(".")[0]
-            : "",
+            : "", // Formatea la fecha de cierre
           fecha_proxima: datetimeToDate(orderData.fecha_proxima),
         };
 
-        setOrder(orderData);
-        setArea(orderData.area);
-        setTipo(orderData.tipo);
-        setEtapa(orderData.etapa);
-        setProcesoLogistico(orderData.proceso_logistico);
-        setPersonaRecibe(orderData.persona_que_recibe);
-        setTrasportadora(orderData.transportadora);
-        setEstadoProducto(JSON.parse(orderData.estado_del_producto));
-        setRequiereImportacion(orderData.requiere_importacion);
-        setIdCliente(orderData.cliente);
-        setEquipo(orderData.equipo);
-        setUsuario(orderData.persona_que_recibe);
+        setOrder(orderData); // Actualiza el estado con la orden
+        setArea(orderData.area); // Actualiza el área
+        setTipo(orderData.tipo); // Actualiza el tipo
+        setEtapa(orderData.etapa); // Actualiza la etapa
+        setProcesoLogistico(orderData.proceso_logistico); // Actualiza el proceso logístico
+        setPersonaRecibe(orderData.persona_que_recibe); // Actualiza la persona que recibe
+        setTrasportadora(orderData.transportadora); // Actualiza la transportadora
+        setEstadoProducto(JSON.parse(orderData.estado_del_producto) || ['']); // Actualiza el estado del producto
+        setRequiereImportacion(orderData.requiere_importacion); // Actualiza si requiere importación
+        setIdCliente(orderData.cliente); // Actualiza el cliente
+        setEquipo(orderData.equipo); // Actualiza el equipo
+        setUsuario(orderData.persona_que_recibe); // Actualiza el usuario
 
-        // Resetear el formulario con los datos del cliente si orderData tiene datos
         if (orderData) {
-          reset(dataOrder);
+          reset(dataOrder); // Resetea el formulario con los datos del cliente si están disponibles
         }
       }
     };
 
-    loadClientData();
-  }, [idEquipo, idCliente, equipo, reset]);
+    loadClientData(); // Llama a la función para cargar los datos del cliente
+  }, [reset, idEquipo]); // Este efecto se ejecuta cuando cambian los valores de reset o idEquipo
 
   const onSubmit = async (data) => {
-    // console.log("Form data:", data); // Asegúrate de que esto se ejecute
-
+    
+    data = {
+      ...data,
+      estado_del_producto: JSON.stringify(data.estado_del_producto),
+    };
+    console.log("Form data:", data); // Asegúrate de que esto se ejecute
     try {
       if (idEquipo === "create") {
         const insert = await insertClientData(data);
@@ -525,21 +528,21 @@ const getLabores = async (order) => {
   }
 };
 
-function Bitacora({ params }) {
+function Bitacora({ params, usuarios }) {
   const order_id = params.id;
-  const [usuarios, setUsuarios] = useState([]);
+  // const [usuarios, setUsuarios] = useState([]);
   const [labores, setLabores] = useState([]);
 
   useEffect(() => {
     const loadData = async () => {
-      let listUser = await getUsuarios();
-      listUser = Array.isArray(listUser)
-        ? listUser.map((item) => ({
-            label: `${item.names} ${item.lastnames}`,
-            value: item.id,
-          }))
-        : [];
-      setUsuarios(listUser);
+      // let listUser = await getUsuarios();
+      // listUser = Array.isArray(listUser)
+      //   ? listUser.map((item) => ({
+      //       label: `${item.names} ${item.lastnames}`,
+      //       value: item.id,
+      //     }))
+      //   : [];
+      // setUsuarios(listUser);
 
       let listLabores = await getLabores(order_id);
       listLabores = Array.isArray(listLabores) ? listLabores : [];
@@ -664,21 +667,35 @@ function Bitacora({ params }) {
   );
 }
 export default function TabsCustomAnimation({ params }) {
+  const [usuarios, setUsuarios] = useState([]);
+  useEffect(() => {
+    const loadData = async () => {
+      let listUser = await getUsuarios();
+      listUser = Array.isArray(listUser)
+        ? listUser.map((item) => ({
+            label: `${item.names} ${item.lastnames}`,
+            value: item.id,
+          }))
+        : [];
+      setUsuarios(listUser);
+    };
+    loadData();
+  }, []);
   const data = [
     {
       label: "Información Basica Y Equipo",
       value: "info",
-      desc: <ClientForm params={params} />,
+      desc: <ClientForm params={params} usuarios={usuarios} />,
     },
     {
       label: "Bitácora de labores realizadas",
       value: "bitacora",
-      desc: <Bitacora params={params} />,
+      desc: <Bitacora params={params} usuarios={usuarios} />,
     },
     {
       label: "Repuestos",
       value: "repuestos",
-      desc: <RepuestosTab params={params} />,
+      desc: <RepuestosTab params={params} usuarios={usuarios} />,
     },
   ];
 
@@ -822,7 +839,7 @@ const RepuestosTab = ({ params, userName }) => {
     const loadProducts = async () => {
       try {
         const productList = await fetchProducts();
-        
+
         setProductos(productList);
         const repuestosList = await fetchProductsOrder(orderId);
         setRepuestos(repuestosList);
@@ -906,13 +923,12 @@ const RepuestosTab = ({ params, userName }) => {
         className="space-y-4 mb-4"
       >
         <div className="w-full">
-         
-          <Select2 
-          label={'Producto'}
-          name={'producto'}
-          rules={{ required: true }}
-          setValue={setValue}
-          options={productos}
+          <Select2
+            label={"Producto"}
+            name={"producto"}
+            rules={{ required: true }}
+            setValue={setValue}
+            options={productos}
           />
           {/* <Select
             id="producto"
@@ -940,7 +956,6 @@ const RepuestosTab = ({ params, userName }) => {
             register={register}
             rules={{ required: true }}
             placeholder="Cantidad"
-            
           />
           {errors.cantidad && (
             <p className="text-red-500">{errors.cantidad.message}</p>
