@@ -6,11 +6,13 @@ import {
   ChevronUpDownIcon,
 } from "@heroicons/react/24/outline";
 import Swal from "sweetalert2";
+import formatDateTime from "../../../libs/formatDateTime";
 import withReactContent from "sweetalert2-react-content";
 import {
   PencilIcon,
   UserPlusIcon,
-  DocumentIcon,
+  DocumentIcon ,
+  CalendarIcon
 } from "@heroicons/react/24/solid";
 import {
   Card,
@@ -84,6 +86,7 @@ export function SortableTable() {
       const data = await fetchOrders();
       const dataTable = data.map((client) => ({
         id: client.id_order,
+        no_order: client.no_order,
         etapa: client.etapa,
         tipo: client.tipo,
         razonSocial: client.razonSocial,
@@ -214,7 +217,7 @@ export function SortableTable() {
           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
             <Link
               href={"orders/create"}
-              className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm"
+              className="flex items-center gap-3 bg-black rounded-lg p-2 text-white text-sm"
               size="sm"
             >
               <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Orden
@@ -264,7 +267,7 @@ export function SortableTable() {
             </tr>
           </thead>
           <tbody>
-            {paginatedRows.map(({ id, etapa, tipo, razonSocial,usuario_creado,fecha_creacion }, index) => {
+            {paginatedRows.map(({ id, no_order,etapa, tipo, razonSocial,usuario_creado,fecha_creacion }, index) => {
               const isLast = index === paginatedRows.length - 1;
               const classes = isLast
                 ? "p-4"
@@ -279,9 +282,9 @@ export function SortableTable() {
                           <Link
                             href={"orders/" + id}
                             variant="small"
-                            className="font-normal opacity-70 text-yellow-800 border-b-2 dark:text-white"
+                            className="font-normal opacity-70 text-yellow-800 border-b-2 dark:text-white bg-yellow-100 p-2 rounded-xl text-center"
                           >
-                            OS-{id}
+                            OS-{no_order}
                           </Link>
                         </Tooltip>
                       </div>
@@ -294,7 +297,7 @@ export function SortableTable() {
                         color="blue-gray"
                         className="font-normal dark:text-white"
                       >
-                        {etapa}
+                        {etapa.toUpperCase().replace(/_/g," ")}
                       </Typography>
                       <Typography
                         variant="small"
@@ -310,7 +313,7 @@ export function SortableTable() {
                         color="blue-gray"
                         className="font-normal dark:text-white"
                       >
-                        {tipo}
+                        {tipo.toUpperCase().replace(/_/g," ")}
                       </Typography>
                     </div>
                   </td>
@@ -318,7 +321,7 @@ export function SortableTable() {
                     <Typography
                       variant="small"
                       color="blue-gray"
-                      className="font-normal dark:text-white"
+                      className="font-normal dark:text-white bg-gray-200 p-1 rounded-xl text-center"
                     >
                       {razonSocial}
                     </Typography>
@@ -327,15 +330,15 @@ export function SortableTable() {
                     <Typography
                       variant="small"
                       color="blue-gray"
-                      className="font-normal dark:text-white"
-                    >{fecha_creacion}</Typography>
+                      className="font-normal dark:text-white bg-gray-200 p-1 rounded-xl text-center"
+                    >{formatDateTime(fecha_creacion)} </Typography>
                   </td>
                   <td>
                   <Typography
                       variant="small"
                       color="blue-gray"
-                      className="font-normal dark:text-white"
-                    >{usuario_creado}</Typography>
+                      className="font-normal dark:text-white bg-gray-200 p-1 rounded-xl text-center"
+                    >{usuario_creado.toUpperCase()}</Typography>
                   </td>
                   <td className={classes}>
                     <Tooltip content="Generar impresion">
@@ -359,6 +362,8 @@ export function SortableTable() {
           className="font-normal dark:text-white"
         >
           Pagina {currentPage} de {totalPages}
+          <br />
+          Total registros {filteredRows.length}
         </Typography>
         <div className="flex gap-2">
           <Button

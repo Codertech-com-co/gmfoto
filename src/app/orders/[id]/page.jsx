@@ -192,10 +192,10 @@ const ClientForm = ({ params, usuarios }) => {
   }, [reset, idEquipo]); // Este efecto se ejecuta cuando cambian los valores de reset o idEquipo
 
   const onSubmit = async (data) => {
-    
+    console.log(data)
     data = {
       ...data,
-      estado_del_producto: JSON.stringify(data.estado_del_producto),
+      // estado_del_producto: JSON.stringify(data.estado_del_producto),
     };
     console.log("Form data:", data); // Asegúrate de que esto se ejecute
     try {
@@ -476,7 +476,7 @@ const ClientForm = ({ params, usuarios }) => {
           <Link href="../orders" className="m-2 text-black">
             Cancelar
           </Link>
-          <Button type="submit" color="yellow" className="m-2">
+          <Button type="submit" color="black" className="m-2">
             Guardar
           </Button>
         </div>

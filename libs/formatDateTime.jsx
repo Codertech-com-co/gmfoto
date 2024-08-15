@@ -1,7 +1,8 @@
 
 export default (datetime) => {
-    const date = new Date(dateTimeString);
-    if (date.includes('1899')) {
+    const date = new Date(datetime);
+
+    if (!date) {
         return "-";
     } else {
         const pad = (num) => num.toString().padStart(2, '0');

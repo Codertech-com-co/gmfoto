@@ -34,7 +34,7 @@ export default function Home() {
         if (!response.ok) {
           throw await response.json();
         }
-        router.push('/')
+        router.push('/orders')
         return response.json();
       })
       .then((result) => {

@@ -12,7 +12,15 @@ const Select2 = ({ name, register, rules, options, label, setValue, ...props }) 
     console.log(selectedOption)
     const valores = Array.isArray(selectedOption) ? selectedOption.map(item => {return item.value} ):''
     setValueLocal(selectedOption);
-    setValue(name, Array.isArray(selectedOption) ? valores : selectedOption.value || ''); // Update value in useForm
+    setValue(
+      name, 
+      Array.isArray(selectedOption) 
+        ? valores 
+        : selectedOption 
+          ? selectedOption.value 
+          : ''
+    );
+     // Update value in useForm
   };
 
   useEffect(() => {
@@ -24,7 +32,8 @@ const Select2 = ({ name, register, rules, options, label, setValue, ...props }) 
          parsedValue = JSON.parse(props.value);
       }
       
-      const dataValue = parsedValue.map(data => buscarPorValue(options, data)[0]).filter(Boolean);
+      const dataValue = [].concat(parsedValue).map(data => buscarPorValue(options, data)[0]).filter(Boolean);
+
       setValueLocal(dataValue);
       setValue(name, props.value);
     } else {
