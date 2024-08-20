@@ -1,5 +1,6 @@
 "use client"
 const API_BASE_URL  = process.env.NEXT_PUBLIC_API_BASE_URL;
+import datetimeToDate from "../../../../../libs/datetimeToDate";
 import { Page, Text, View, Document, StyleSheet, Image,Font  } from '@react-pdf/renderer';
 import { useEffect, useState } from "react";
 import { Breadcrumbs, Button } from "@material-tailwind/react";
@@ -193,7 +194,7 @@ const Header = (data) => {
         <View style={{ fontSize: 6, textAlign: 'center', marginBottom: 5 }}>
           <Text style={styles.headerText}>SERVICIO TÉCNICO AUTORIZADO</Text>
           <Text style={styles.headerText}>WhatsApp: 316 7432951 - 318 6085419</Text>
-          <Text style={styles.headerText}>e-mail: german.gonzalez@gnmfoto.com.co</Text>
+          <Text style={styles.headerText}>e-mail: german.gonzalez@gmfoto.com.co</Text>
         </View>
       </View>
     </>
@@ -263,6 +264,8 @@ const CustomerInfo = (data) => {
 
 const ProductInfo = (data) => {
   data = data.data
+  const estado = JSON.parse(data.estado_del_producto)
+  console.log(estado)
   
   return (
     <View style={styles.section}>
@@ -295,26 +298,30 @@ const ProductInfo = (data) => {
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <Text style={styles.label}>Almacen donde compro el producto:</Text>
-          <Text style={styles.input}>.</Text>
+          <Text style={styles.label}>Estado del producto:</Text>
+          <Text style={styles.input}>
+            {estado.map((key)=> (
+              <Text key={key}>{key.replace(/_/g,' ')}, </Text>
+            ))}
+          </Text>
         </View>
       </View>
       <View style={styles.row} >
 
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <Text style={styles.label}>Fecha de compa:</Text>
-          <Text style={styles.input}>.</Text>
+          <Text style={styles.label}>Fecha de compra:</Text>
+          <Text style={styles.input}>{datetimeToDate(data.fecha_factura)  }</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Equipo con garantia:</Text>
-          <Text style={styles.input}>{data.tipo}</Text>
+          <Text style={styles.input}>{data.tipo.toUpperCase().replace(/_/g,' ')}</Text>
         </View>
       </View>
       <View style={styles.row} >
 
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Numero de la factura:</Text>
-          <Text style={styles.input}>.</Text>
+          <Text style={styles.input}>{data.no_factura}</Text>
         </View>
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Persona que recibe el producto:</Text>

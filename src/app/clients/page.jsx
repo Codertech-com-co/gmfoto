@@ -257,7 +257,7 @@ export default function SortableTable() {
                         </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                        <Link href={"clients/create"} className="flex items-center gap-3 bg-yellow-500 rounded-lg p-2 text-black text-sm" size="sm">
+                        <Link href={"clients/create"} className="flex items-center gap-3 bg-black rounded-lg p-2 text-white text-sm" size="sm">
                             <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Crear Nuevo
                         </Link>
                     </div>
@@ -365,7 +365,7 @@ export default function SortableTable() {
                                                 <Typography
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal opacity-70"
+                                                    className="font-normal opacity-70 bg-gray-200 p-1 rounded-xl text-center"
                                                 >
                                                     {documento}
                                                 </Typography>
@@ -385,7 +385,7 @@ export default function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal bg-gray-200 p-1 rounded-xl text-center"
                                             >
                                                 {date}
                                             </Typography>
@@ -397,7 +397,7 @@ export default function SortableTable() {
                                                 </Link>
                                             </Tooltip>
                                             <Tooltip content="Eliminar Cliente">
-                                                <Button className='m-2 p-1' onClick={() => deleteClient(id)}>
+                                                <Button className='m-2 p-1' color='red' onClick={() => deleteClient(id)}>
                                                     <TrashIcon className="h-4 w-4" />
                                                 </Button>
                                             </Tooltip>
@@ -419,7 +419,7 @@ export default function SortableTable() {
                     <Button variant="outlined" className='border-yellow-500' size="sm" onClick={handlePreviousPage}>
                         Anterior
                     </Button>
-                    <Button className='bg-yellow-500 text-black' size="sm" onClick={handleNextPage}>
+                    <Button color='black' size="sm" onClick={handleNextPage}>
                         Siguiente
                     </Button>
                 </div>

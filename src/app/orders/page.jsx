@@ -52,13 +52,14 @@ const TABS = [
 ];
 
 const TABLE_HEAD = [
+  "",
   "Consecutivo",
   "Etapa",
   "Tipo",
   "Cliente",
   "Fecha Creacion",
   "Creado por",
-  "",
+  
 ];
 
 const ROWS_PER_PAGE = 10;
@@ -275,6 +276,15 @@ export function SortableTable() {
 
               return (
                 <tr key={id}>
+                   <td className={classes}>
+                    <Tooltip content="Generar impresion">
+                      <Link href={"orders/" + id + "/document"}>
+                        <IconButton variant="text">
+                          <DocumentIcon className="h-4 w-4 dark:text-white text-yellow-900" />
+                        </IconButton>
+                      </Link>
+                    </Tooltip>
+                  </td>
                   <td className={classes}>
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col">
@@ -340,15 +350,7 @@ export function SortableTable() {
                       className="font-normal dark:text-white bg-gray-200 p-1 rounded-xl text-center"
                     >{usuario_creado.toUpperCase()}</Typography>
                   </td>
-                  <td className={classes}>
-                    <Tooltip content="Generar impresion">
-                      <Link href={"orders/" + id + "/document"}>
-                        <IconButton variant="text">
-                          <DocumentIcon className="h-4 w-4 dark:text-white" />
-                        </IconButton>
-                      </Link>
-                    </Tooltip>
-                  </td>
+                 
                 </tr>
               );
             })}

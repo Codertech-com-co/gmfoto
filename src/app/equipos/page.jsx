@@ -259,7 +259,7 @@ export function SortableTable() {
 
                                                     variant="small"
                                                     color="blue-gray"
-                                                    className="font-normal opacity-70"
+                                                    className="font-normal opacity-70 "
                                                 >
                                                     {referencia}
                                                 </Typography>
@@ -269,7 +269,7 @@ export function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal bg-gray-200 p-1 rounded-xl text-center"
                                             >
                                                 {descripcion}
                                             </Typography>
@@ -298,7 +298,7 @@ export function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal bg-gray-200 p-1 rounded-xl text-center"
                                             >
                                                 {datetimeToDate(fecha_factura)}
                                             </Typography>
@@ -307,7 +307,7 @@ export function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal bg-gray-200 p-1 rounded-xl text-center"
                                             >
                                                 {creado_por}
                                             </Typography>
@@ -316,7 +316,7 @@ export function SortableTable() {
                                             <Typography
                                                 variant="small"
                                                 color="blue-gray"
-                                                className="font-normal"
+                                                className="font-normal bg-gray-200 p-1 rounded-xl text-center"
                                             >
                                                 {modificado_por}
                                             </Typography>

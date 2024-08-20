@@ -316,6 +316,13 @@ const ROWS_PER_PAGE = 10;
           rules={{ required: false }}
           type="date"
         />
+        <Input
+          label={"No factura"}
+          name={"no_factura"}
+          register={register}
+          rules={{ required: false }}
+          type="text"
+        />
 
         <div className="w-full col-span-1 md:col-span-2 text-right p-5">
           <Link href="../equipos" className="m-2 text-black">
