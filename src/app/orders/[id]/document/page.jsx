@@ -286,6 +286,20 @@ const ProductInfo = (data) => {
       </View>
       <View style={styles.row} >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Text style={styles.label}>Modelo:</Text>
+          <Text style={styles.input}>{data.descripcion}</Text>
+        </View>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Text style={styles.label}>Modelo:</Text>
+          <Text style={styles.input}>ENVIA</Text>
+        </View> */}
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Text style={styles.label}>Referencia:</Text>
+          <Text style={styles.input}>{data.referencia}</Text>
+        </View>
+      </View>
+      <View style={styles.row} >
+        <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
           <Text style={styles.label}>Accesorios:</Text>
           <Text style={styles.textArea}>{data.accesorios}</Text>
         </View>
