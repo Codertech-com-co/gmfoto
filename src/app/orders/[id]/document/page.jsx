@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 8,
     fontWeight: 600,
-    color:"#595959"
+    color: "#595959",
   },
   section: {
     marginBottom: 5,
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   row: {
-    marginTop:2,
+    marginTop: 2,
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 3,
@@ -83,9 +83,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 8,
     marginLeft: 5,
-    backgroundColor:"#f0f0f0",
-    padding:3,
-    borderRadius:2
+    backgroundColor: "#f0f0f0",
+    padding: 3,
+    borderRadius: 2,
   },
   bold: {
     fontSize: 8,
@@ -266,7 +266,6 @@ const CustomerInfo = (data) => {
           <Text style={styles.input}>{data.telefonoEstablecimiento}</Text>
         </View>
       </View>
-     
     </View>
   );
 };
@@ -274,7 +273,6 @@ const CustomerInfo = (data) => {
 const ProductInfo = (data) => {
   data = data.data;
   const estado = JSON.parse(data.estado_del_producto);
-
 
   return (
     <View style={styles.section}>
@@ -284,7 +282,7 @@ const ProductInfo = (data) => {
           <Text style={styles.label}>Marca:</Text>
           <Text style={styles.input}>{data.marca}</Text>
         </View>
-        
+
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Serial:</Text>
           <Text style={styles.input}>{data.serial}</Text>
@@ -295,7 +293,7 @@ const ProductInfo = (data) => {
           <Text style={styles.label}>Modelo:</Text>
           <Text style={styles.input}>{data.descripcion}</Text>
         </View>
-        
+
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Referencia:</Text>
           <Text style={styles.input}>{data.referencia}</Text>
@@ -369,9 +367,22 @@ const ServiceInfo = (data) => {
     <View style={styles.section}>
       <View style={styles.row}>
         <Text style={styles.label}>INFORMACIÓN SERVICIO TÉCNICO</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1, marginLeft:200 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            flex: 1,
+            marginLeft: 200,
+          }}
+        >
           <Text style={styles.label}>Técnico Asignado</Text>
-          <Text style={styles.input}>{data.labores[(data.labores.length >0)?data.labores.length -1:0].names+ " "+data.labores[(data.labores.length >0)?data.labores.length -1:0].lastnames}</Text>
+          <Text style={styles.input}>
+            {data.labores.length > 0
+              ? `${data.labores[data.labores.length - 1].names} ${
+                  data.labores[data.labores.length - 1].lastnames
+                }`
+              : ""}
+          </Text>
         </View>
       </View>
       <View style={styles.row}>
@@ -398,9 +409,12 @@ const ServiceInfo = (data) => {
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Trabajo realizado:</Text>
           <View style={styles.textArea}>
-            <Text>
-            {data.labores[(data.labores.length >0)?data.labores.length -1:0].labor}
+            <Text >
+              {data.labores.length > 0
+                ? data.labores[data.labores.length - 1].labor
+                : ""}
             </Text>
+
             {/* {data.labores.map(item=>{
               return (
                 <View>
