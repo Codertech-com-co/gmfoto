@@ -62,20 +62,18 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 8,
     fontWeight: 600,
-    color:"#595959"
   },
   section: {
-    marginBottom: 5,
+    marginBottom: 10,
     padding: 8,
-    border: "0px solid #c0c0c0",
+    border: "1px solid #c0c0c0",
     borderStyle: "dashed",
     borderRadius: 10,
   },
   row: {
-    marginTop:2,
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 3,
+    marginBottom: 5,
   },
   column: {
     display: "flex",
@@ -83,9 +81,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 8,
     marginLeft: 5,
-    backgroundColor:"#f0f0f0",
-    padding:3,
-    borderRadius:2
+    backgroundColor:""
   },
   bold: {
     fontSize: 8,
@@ -95,7 +91,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: 7,
     borderStyle: "dashed",
-    border: "1px solid #c6c6c6",
+    border: "1px solid #c0c0c0",
     padding: 3,
     borderRadius: 5,
     flex: 1,
@@ -103,11 +99,11 @@ const styles = StyleSheet.create({
   },
   textArea: {
     borderStyle: "dashed",
-    border: "1px solid #c6c6c6",
+    border: "1px solid #c0c0c0",
     flex: 1,
     padding: 3,
     minHeight: 35,
-    borderRadius: 5,
+    borderRadius: 10,
     fontSize: 7,
     marginLeft: 5,
   },
@@ -266,41 +262,6 @@ const CustomerInfo = (data) => {
           <Text style={styles.input}>{data.telefonoEstablecimiento}</Text>
         </View>
       </View>
-     
-    </View>
-  );
-};
-
-const ProductInfo = (data) => {
-  data = data.data;
-  const estado = JSON.parse(data.estado_del_producto);
-
-
-  return (
-    <View style={styles.section}>
-      <Text style={styles.label}>DATOS DEL PRODUCTO</Text>
-      <View style={styles.row}>
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <Text style={styles.label}>Marca:</Text>
-          <Text style={styles.input}>{data.marca}</Text>
-        </View>
-        
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <Text style={styles.label}>Serial:</Text>
-          <Text style={styles.input}>{data.serial}</Text>
-        </View>
-      </View>
-      <View style={styles.row}>
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <Text style={styles.label}>Modelo:</Text>
-          <Text style={styles.input}>{data.descripcion}</Text>
-        </View>
-        
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-          <Text style={styles.label}>Referencia:</Text>
-          <Text style={styles.input}>{data.referencia}</Text>
-        </View>
-      </View>
       <View style={styles.row}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Guia de Envio:</Text>
@@ -313,6 +274,46 @@ const ProductInfo = (data) => {
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Fecha de Envio:</Text>
           <Text style={styles.input}>{data.fecha_cierre || ""}</Text>
+        </View>
+      </View>
+    </View>
+  );
+};
+
+const ProductInfo = (data) => {
+  data = data.data;
+  const estado = JSON.parse(data.estado_del_producto);
+  console.log(estado);
+
+  return (
+    <View style={styles.section}>
+      <Text style={styles.label}>DATOS DEL PRODUCTO</Text>
+      <View style={styles.row}>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Text style={styles.label}>Marca:</Text>
+          <Text style={styles.input}>{data.marca}</Text>
+        </View>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Text style={styles.label}>Modelo:</Text>
+          <Text style={styles.input}>ENVIA</Text>
+        </View> */}
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Text style={styles.label}>Serial:</Text>
+          <Text style={styles.input}>{data.serial}</Text>
+        </View>
+      </View>
+      <View style={styles.row}>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Text style={styles.label}>Modelo:</Text>
+          <Text style={styles.input}>{data.descripcion}</Text>
+        </View>
+        {/* <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
+          <Text style={styles.label}>Modelo:</Text>
+          <Text style={styles.input}>ENVIA</Text>
+        </View> */}
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+          <Text style={styles.label}>Referencia:</Text>
+          <Text style={styles.input}>{data.referencia}</Text>
         </View>
       </View>
       <View style={styles.row}>
@@ -451,7 +452,7 @@ const Authorization = (data) => {
       <View
         style={{
           flex: 1,
-          border: "0px solid #c0c0c0",
+          border: "1px solid #c0c0c0",
           borderStyle: "dashed",
           padding: 5,
           borderRadius: 15,
@@ -493,7 +494,7 @@ const Authorization = (data) => {
       <View
         style={{
           flex: 1,
-          border: "0px solid #c0c0c0",
+          border: "1px solid #c0c0c0",
           borderStyle: "dashed",
           padding: 10,
           borderRadius: 15,
