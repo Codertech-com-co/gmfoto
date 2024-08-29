@@ -318,13 +318,13 @@ const ProductInfo = (data) => {
       <View style={styles.row}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Accesorios:</Text>
-          <Text style={styles.textArea}>{data.accesorios}</Text>
+          <Text style={styles.input}>{data.accesorios}</Text>
         </View>
       </View>
       <View style={styles.row}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Daño reportado:</Text>
-          <Text style={styles.input}>{data.falla_reportada}</Text>
+          <Text style={styles.textArea}>{data.falla_reportada}</Text>
         </View>
       </View>
       <View style={styles.row}>
@@ -369,7 +369,7 @@ const ServiceInfo = (data) => {
     <View style={styles.section}>
       <View style={styles.row}>
         <Text style={styles.label}>INFORMACIÓN SERVICIO TÉCNICO</Text>
-        <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", flex: 1, marginLeft:200 }}>
           <Text style={styles.label}>Técnico Asignado</Text>
           <Text style={styles.input}>{data.labores[(data.labores.length >0)?data.labores.length -1:0].names+ " "+data.labores[(data.labores.length >0)?data.labores.length -1:0].lastnames}</Text>
         </View>

@@ -29,6 +29,7 @@ import {
 import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
 import { useRouter } from 'next/navigation';
+import formatDateTime from '../../../libs/formatDateTime';
 
 const MySwal = withReactContent(Swal);
 
@@ -74,7 +75,7 @@ export default function SortableTable() {
                 job: client.nombrePersonaContacto,
                 org: client.NombreEstablecimiento,
                 online: true,
-                date: "04/10/2024",
+                date: formatDateTime(client.fecha_creacion),
             }));
             setTableRows(dataTable);
             setLoading(false);

@@ -246,7 +246,7 @@ export default function ClientForm({ params }) {
         <Input
           label="Nombre Establecimiento"
           name="NombreEstablecimiento"
-          rules={{ required: true }}
+          rules={{ required: false }}
           register={register}
           errors={errors}
         />
@@ -274,14 +274,14 @@ export default function ClientForm({ params }) {
         <Input
           label="Propietario"
           name="propietario"
-          rules={{ required: true }}
+          rules={{ required: false }}
           register={register}
           errors={errors}
         />
         <Input
           label="Dirección"
           name="direccion"
-          rules={{ required: true }}
+          rules={{ required: false }}
           register={register}
           errors={errors}
         />
