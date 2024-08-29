@@ -465,7 +465,7 @@ const Authorization = (data) => {
       <View
         style={{
           flex: 1,
-          border: "0px solid #c0c0c0",
+          border: "1px solid #c0c0c0",
           borderStyle: "dashed",
           padding: 5,
           borderRadius: 15,
@@ -507,7 +507,7 @@ const Authorization = (data) => {
       <View
         style={{
           flex: 1,
-          border: "0px solid #c0c0c0",
+          border: "1px solid #c0c0c0",
           borderStyle: "dashed",
           padding: 10,
           borderRadius: 15,
