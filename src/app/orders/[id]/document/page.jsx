@@ -179,6 +179,7 @@ function MyDocument(props) {
 }
 
 const Header = (data) => {
+  data = data.data;
   return (
     <>
       <View style={styles.header}>
@@ -189,7 +190,7 @@ const Header = (data) => {
             alt="Company Logo"
           />
           <Text style={{ fontSize: 10, fontWeight: "bold", marginTop: 8 }}>
-            ORDEN DE SERVICIO No. <Text style={{ color: "red" }}>5</Text>
+            ORDEN DE SERVICIO No. <Text style={{ color: "red" }}>{data.no_order}</Text>
           </Text>
         </View>
 
