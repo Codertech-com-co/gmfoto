@@ -254,7 +254,7 @@ const CustomerInfo = (data) => {
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Teléfono fijo:</Text>
-          <Text style={styles.input}>12546</Text>
+          <Text style={styles.input}>{data.celularPersonaContacto}</Text>
         </View>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Celular:</Text>
@@ -264,7 +264,7 @@ const CustomerInfo = (data) => {
       <View style={styles.row}>
         <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
           <Text style={styles.label}>Correo electronico:</Text>
-          <Text style={styles.input}>{data.telefonoEstablecimiento}</Text>
+          <Text style={styles.input}>{data.email}</Text>
         </View>
       </View>
     </View>
