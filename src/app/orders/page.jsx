@@ -235,6 +235,8 @@ export function SortableTable() {
           </div>
         </div>
         <br />
+        <Button>Exportar Datos</Button>
+        <br />
         {/* <Button
           variant="outlined"
           className="border-yellow-500 text-balnk dark:text-white"
