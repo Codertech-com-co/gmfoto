@@ -94,7 +94,7 @@ export function SortableTable() {
         tipo: client.tipo,
         razonSocial: client.razonSocial,
         usuario_creado: client.usuario_creado,
-        fecha_creacion: client.fecha_creacion,
+        // fecha_creacion: client.created_at,
         ...client
       }));
       setTableRows(dataTable);
@@ -315,7 +315,7 @@ export function SortableTable() {
             </tr>
           </thead>
           <tbody>
-            {paginatedRows.map(({ id, no_order,etapa, tipo, razonSocial,usuario_creado,fecha_creacion }, index) => {
+            {paginatedRows.map(({ id, no_order,etapa, tipo, razonSocial,usuario_creado,created_at }, index) => {
               const isLast = index === paginatedRows.length - 1;
               const classes = isLast
                 ? "p-4"
@@ -388,7 +388,7 @@ export function SortableTable() {
                       variant="small"
                       color="blue-gray"
                       className="font-normal dark:text-white bg-gray-200 p-1 rounded-xl text-center"
-                    >{formatDateTime(fecha_creacion)} </Typography>
+                    >{formatDateTime(created_at)} </Typography>
                   </td>
                   <td>
                   <Typography
