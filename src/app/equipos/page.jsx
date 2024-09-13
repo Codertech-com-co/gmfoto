@@ -27,7 +27,8 @@ import Link from 'next/link';
 import { LoadingPage } from '@/components/ui/Loading';
 import { fetchEquipos } from '../../utils/api/equipos';
 import datetimeToDate from '../../../libs/datetimeToDate'
-
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
    
 
 const MySwal = withReactContent(Swal);
@@ -77,6 +78,7 @@ export function SortableTable() {
                 creado_por: client.creado_por,
                 modificado_por: client.modificado_por,
                 online: client.activo,  // Supongo que hay un campo para el estado online/offline
+                ...client
             }));
             setTableRows(dataTable);
             setLoading(false);
@@ -179,6 +181,49 @@ export function SortableTable() {
         return <LoadingPage />;
     }
 
+
+
+    const handleExport = async () => {
+        const { value: exportChoice } = await MySwal.fire({
+          title: "Exportar Datos",
+          text: "¿Quieres exportar los datos de la página actual o de todas las páginas?",
+          input: "radio",
+          inputOptions: {
+            current: "Página actual",
+            all: "Todas las páginas",
+          },
+          inputValidator: (value) => {
+            if (!value) {
+              return "Necesitas seleccionar una opción";
+            }
+          },
+          confirmButtonText: "Exportar",
+          cancelButtonText: "Cancelar",
+          showCancelButton: true,
+        });
+    
+        if (exportChoice) {
+          let dataToExport = [];
+          if (exportChoice === "current") {
+            const paginatedRows = TABLE_ROWS.slice(
+              (currentPage - 1) * ROWS_PER_PAGE,
+              currentPage * ROWS_PER_PAGE
+            );
+            dataToExport = paginatedRows;
+          } else if (exportChoice === "all") {
+            dataToExport = TABLE_ROWS;
+          }
+    
+          const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+          const workbook = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(workbook, worksheet, "Equipos");
+          const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+          saveAs(
+            new Blob([wbout], { type: "application/octet-stream" }),
+            "Equipos.xlsx"
+          );
+        }
+      };
     return (
         <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 ">
             <CardHeader floated={false} shadow={false} className="rounded-none ">
@@ -217,7 +262,7 @@ export function SortableTable() {
                 </div>
 
                 <br />
-                {/* <Button variant='outlined' className='border-yellow-500 text-black' size='sm'>Exportar Datos</Button> */}
+                <Button variant='outlined' className='border-yellow-500 text-black' size='sm' onClick={handleExport}>Exportar Datos</Button>
             </CardHeader>
             <CardBody className="overflow-auto px-0">
                 <table className="mt-4 w-full min-w-max table-auto text-left dark:text-white" >

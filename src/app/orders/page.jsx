@@ -33,6 +33,8 @@ import {
 import Link from "next/link";
 import { LoadingPage } from "@/components/ui/Loading";
 import { fetchOrders } from "../../utils/api/orders";
+import { saveAs } from "file-saver";
+import * as XLSX from "xlsx";
 
 const MySwal = withReactContent(Swal);
 
@@ -93,6 +95,7 @@ export function SortableTable() {
         razonSocial: client.razonSocial,
         usuario_creado: client.usuario_creado,
         fecha_creacion: client.fecha_creacion,
+        ...client
       }));
       setTableRows(dataTable);
       setLoading(false);
@@ -192,6 +195,48 @@ export function SortableTable() {
     return <LoadingPage />;
   }
 
+
+  const handleExport = async () => {
+    const { value: exportChoice } = await MySwal.fire({
+      title: "Exportar Datos",
+      text: "¿Quieres exportar los datos de la página actual o de todas las páginas?",
+      input: "radio",
+      inputOptions: {
+        current: "Página actual",
+        all: "Todas las páginas",
+      },
+      inputValidator: (value) => {
+        if (!value) {
+          return "Necesitas seleccionar una opción";
+        }
+      },
+      confirmButtonText: "Exportar",
+      cancelButtonText: "Cancelar",
+      showCancelButton: true,
+    });
+
+    if (exportChoice) {
+      let dataToExport = [];
+      if (exportChoice === "current") {
+        const paginatedRows = TABLE_ROWS.slice(
+          (currentPage - 1) * ROWS_PER_PAGE,
+          currentPage * ROWS_PER_PAGE
+        );
+        dataToExport = paginatedRows;
+      } else if (exportChoice === "all") {
+        dataToExport = TABLE_ROWS;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Ordenes de Servicios");
+      const wbout = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+      saveAs(
+        new Blob([wbout], { type: "application/octet-stream" }),
+        "Ordenes de Servicio.xlsx"
+      );
+    }
+  };
   return (
     <Card className="h-full w-full m-auto mt-5 shadow-none border-2 border-dashed p-5 dark:bg-black dark:border-gray-700">
       <CardHeader
@@ -235,7 +280,7 @@ export function SortableTable() {
           </div>
         </div>
         <br />
-        <Button>Exportar Datos</Button>
+        <Button onClick={handleExport}>Exportar Datos</Button>
         <br />
         {/* <Button
           variant="outlined"
